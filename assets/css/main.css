@@ -1,0 +1,187 @@
+@import "tailwindcss";
+
+:root {
+}
+
+* {
+  font-family: "FS Magistral", sans-serif;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: auto; /* auto tính theo content */
+  min-height: 100%; /* đảm bảo có thể cao thêm */
+}
+body {
+  /* position: relative;
+  background: linear-gradient(180deg, #121d7b 0%, #111167 100%);
+  margin: 0;
+  padding: 0; */
+  position: relative;
+  background: linear-gradient(180deg, #121d7b 0%, #111167 100%);
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+.icon {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+.viewChallenger {
+  background: linear-gradient(
+    to top,
+    var(--textButton) 50%,
+    var(--textPrimary) 50%
+  );
+  color: var(--textPrimary);
+  border: none;
+  padding: 12px 10px 12px 14px;
+  border-radius: 30px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  background-size: 100% 200%;
+  background-position: bottom;
+  transition: background-position 0.4s ease-in-out, color 0.4s ease-in-out;
+}
+.viewChallenger:hover {
+  background-position: top;
+  color: var(--textsport);
+}
+.TextSport {
+  background-image: linear-gradient(
+    90deg,
+    var(--textsport) 20.69%,
+    var(--textsport2) 58.36%
+  );
+}
+
+.logo {
+  width: 198px;
+  height: 49px;
+  object-fit: contain;
+}
+.checkbox {
+  accent-color: var(--textsport);
+  color: #ffff;
+}
+/* Toàn bộ thanh cuộn */
+::-webkit-scrollbar {
+  width: 8px; /* Độ rộng thanh cuộn dọc */
+  height: 8px; /* Dành cho thanh cuộn ngang */
+}
+
+/* Nền của thanh cuộn */
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 1); /* Màu nền */
+}
+
+/* Thanh kéo (nút trượt) */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #e97552 0%, #a949cf 100%);
+  /* Màu xanh lá */
+  border-radius: 4px;
+}
+
+select {
+  width: 100%;
+  padding: 0.875rem;
+  font-size: 1rem;
+  border: 1.5px solid var(--textButton);
+  border-radius: 0.5rem;
+  box-shadow: 2.5px 3px 0 var(--textButton);
+  outline: none;
+  transition: ease 0.25s;
+}
+
+select:focus {
+  box-shadow: 5.5px 7px 0 var(--textButton);
+}
+/* From Uiverse.io by risabbir */
+.nebula-input {
+  position: relative;
+  width: 100%;
+  margin: 10px auto;
+}
+
+.text__content-center {
+  font-style: Bold;
+  font-weight: 700;
+  font-size: 64px;
+  font-size: 64px;
+  line-height: 88px;
+  letter-spacing: 2%;
+}
+.text-greenviet {
+  color: #21bf64;
+}
+.giaidau_button {
+  gap: 4px;
+  border-radius: 28px;
+  padding-top: 8px;
+
+  padding-right: 16px;
+  padding-bottom: 8px;
+  padding-left: 8px;
+  border: 1px solid rgba(0, 255, 34, 0.4);
+}
+.giaidau_button p {
+  line-height: 27px;
+}
+.lichThidau2 {
+  position: relative;
+  background: rgba(248, 242, 241, 1);
+}
+
+.lichThidau2::before {
+  content: "";
+  height: 100%;
+  width: 17px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 60%;
+  background-color: rgba(250, 249, 249, 1);
+  transform: skew(-30deg, -30deg);
+}
+.bg {
+  position: relative;
+  width: 100%;
+  background: linear-gradient(89.01deg, #f17f4b 1.67%, #9339f6 100%);
+  margin-top: -240px;
+}
+
+.bg::after {
+  content: "";
+  position: absolute;
+  inset: 8px 0 0 0;
+  background: rgba(250, 249, 249, 1);
+  border-radius: 29px 29px 0 0;
+  z-index: 0;
+}
+
+.bg2 {
+  position: relative;
+  z-index: 1; /* để nội dung nổi trên lớp phủ */
+}
+.search {
+  border: 1px solid rgba(177, 174, 172, 1);
+
+  background: rgba(255, 255, 255, 1);
+}
+.IconSearch {
+  top: 30%;
+  left: 14px;
+  width: 23px;
+  height: 23px;
+  border-width: 2px;
+}
+.dotCirCle {
+  width: 15px;
+  height: 15px;
+  background-color: rgba(255, 229, 190, 1);
+}

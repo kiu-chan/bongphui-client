@@ -1,0 +1,144 @@
+import { defineStore } from "pinia";
+
+export const useTournamentStore = defineStore("taogiaidau", {
+  state: () => ({
+    list_tournament: {
+      url: "/tournaments",
+      methods: "GET",
+    },
+    tournament_ongoing: {
+      url: "/tournaments/ongoing",
+      methods: "GET",
+    },
+    search_tournament: {
+      url: "/tournaments/search",
+      methods: "GET",
+    },
+    add_tournament: {
+      url: "/tournaments",
+      methods: "POST",
+    },
+    listTeam_tournament: {
+      url: "/tournaments/:id/teams",
+      methods: "GET",
+    },
+    AddTeam_tournament: {
+      url: "/tournaments/:tournamentId/teams",
+      methods: "POST",
+    },
+    delTeam_tournament: {
+      url: "/tournaments/:tournamentId/teams/:teamId",
+      methods: "DELETE",
+    },
+    del_tournament: {
+      url: "/tournaments/:id",
+      methods: "DELETE",
+    },
+    detail_tournament: {
+      url: "/tournaments/:id",
+      methods: "GET",
+    },
+    update_tournament: {
+      url: "/tournaments/:id",
+      methods: "PUT",
+    },
+    create_league: {
+      url: "/tournaments/:tournamentId/create-leagues/batch",
+      methods: "POST",
+    },
+    batch_team: {
+      url: "/tournaments/:tournamentId/teams/batch",
+      methods: "POST",
+    },
+    league_tournament: {
+      url: "/leagues/tournament/:tournamentId",
+      methods: "GET",
+    },
+    league_matches: {
+      url: "/tournaments/tournaments/:id/matches",
+      methods: "GET",
+    },
+    add_matchesLeague: {
+      url: "/tournaments/:id/generate-matches",
+      methods: "POST",
+    },
+    listTournamentFeatured: {
+      url: "/tournaments/featured",
+      get: "GET",
+    },
+  }),
+  actions: {
+    async fnGetTournament(url: string) {
+      const { $api } = useNuxtApp();
+      return await $api.get(`${this.list_tournament.url}${url}`);
+    },
+    async fnGetListFeature() {
+      const { $api } = useNuxtApp();
+      return await $api.get(`${this.listTournamentFeatured.url}`);
+    },
+    async fnGetTournamentOngoing(url: string) {
+      const { $api } = useNuxtApp();
+      return await $api.get(`${this.tournament_ongoing.url}${url}`);
+    },
+    async fnGetTeamsTournament(id: any) {
+      const { $api } = useNuxtApp();
+      return await $api.get(
+        this.listTeam_tournament.url.replaceAll(":id", String(id))
+      );
+    },
+    async fnGetTournamentSearch(url: any) {
+      const { $api } = useNuxtApp();
+      return await $api.get(`${this.search_tournament.url}${url}`);
+    },
+    async fnGetLeagueMatches(id: any) {
+      const { $api } = useNuxtApp();
+      return await $api.get(
+        this.league_matches.url.replaceAll(":id", String(id))
+      );
+    },
+    async fnAddTournament(payload: any) {
+      const { $api } = useNuxtApp();
+      return await $api.post(this.add_tournament.url, payload);
+    },
+    async fnCreatedLeague(id: any, payload: any) {
+      const { $api } = useNuxtApp();
+      return await $api.post(
+        this.create_league.url.replaceAll(":tournamentId", String(id)),
+        payload
+      );
+    },
+    async fnAddBatchTeam(id: any, payload: any) {
+      const { $api } = useNuxtApp();
+      return await $api.post(
+        this.batch_team.url.replaceAll(":tournamentId", String(id)),
+        payload
+      );
+    },
+    async fnAddTeamsTournament(id: any, payload: any) {
+      const { $api } = useNuxtApp();
+      return await $api.post(
+        this.AddTeam_tournament.url.replaceAll(":tournamentId", String(id)),
+        payload
+      );
+    },
+    async fnDelTeamTournament(idTeam: any, idTour: any) {
+      const { $api } = useNuxtApp();
+      const url = this.delTeam_tournament.url
+        .replace(":tournamentId", String(idTour))
+        .replace(":teamId", String(idTeam));
+      return await $api.delete(url);
+    },
+    async fnDelTournament(id: number) {
+      const { $api } = useNuxtApp();
+      return await $api.delete(
+        this.del_tournament.url.replaceAll(":id", String(id))
+      );
+    },
+    async fnAddLeagueMatches(id: any) {
+      const { $api } = useNuxtApp();
+      return await $api.post(
+        this.add_matchesLeague.url.replaceAll(":id", String(id))
+      );
+    },
+  },
+});
