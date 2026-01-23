@@ -3,90 +3,90 @@ import { defineStore } from "pinia";
 export const useTournamentStore = defineStore("taogiaidau", {
   state: () => ({
     list_tournament: {
-      url: "/tournaments",
+      url: "/api/tournaments",
       methods: "GET",
     },
 
     search_tournament: {
-      url: "/tournaments/search",
+      url: "/api/tournaments/search",
       methods: "GET",
     },
     add_tournament: {
-      url: "/tournaments",
+      url: "/api/tournaments",
       methods: "POST",
     },
     listTeam_tournament: {
-      url: "/tournaments/:id/teams",
+      url: "/api/tournaments/:id/teams",
       methods: "GET",
     },
     AddTeam_tournament: {
-      url: "/tournaments/:tournamentId/teams",
+      url: "/api/tournaments/:tournamentId/teams",
       methods: "POST",
     },
     delTeam_tournament: {
-      url: "/tournaments/:tournamentId/teams/:teamId",
+      url: "/api/tournaments/:tournamentId/teams/:teamId",
       methods: "DELETE",
     },
     del_tournament: {
-      url: "/tournaments/:id",
+      url: "/api/tournaments/:id",
       methods: "DELETE",
     },
     detail_tournament: {
-      url: "/tournaments/:id",
+      url: "/api/tournaments/:id",
       methods: "GET",
     },
     update_tournament: {
-      url: "/tournaments/:id",
+      url: "/api/tournaments/:id",
       methods: "PUT",
     },
     create_league: {
-      url: "/tournaments/:tournamentId/create-leagues/batch",
+      url: "/api/tournaments/:tournamentId/create-leagues/batch",
       methods: "POST",
     },
     batch_team: {
-      url: "/tournaments/:tournamentId/teams/batch",
+      url: "/api/tournaments/:tournamentId/teams/batch",
       methods: "POST",
     },
     league_tournament: {
-      url: "/leagues/tournament/:tournamentId",
+      url: "/api/leagues/tournament/:tournamentId",
       methods: "GET",
     },
     league_matches: {
-      url: "/tournaments/tournaments/:id/matches",
+      url: "/api/tournaments/tournaments/:id/matches",
       methods: "GET",
     },
     add_matchesLeague: {
-      url: "/tournaments/:id/generate-matches",
+      url: "/api/tournaments/:id/generate-matches",
       methods: "POST",
     },
     listOnGoing: {
-      url: "/tournaments/ongoing",
+      url: "/api/tournaments/ongoing",
       methods: "GET",
     },
     listFeartured: {
-      url: "/tournaments/featured",
+      url: "/api/tournaments/featured",
       methods: "GET",
     },
     listUpcoming: {
-      url: "/tournaments/upcoming",
+      url: "/api/tournaments/upcoming",
       methods: "GET",
     },
     listCompleted: {
-      url: "/tournaments/completed",
+      url: "/api/tournaments/completed",
       methods: "GET",
     },
 
     // fees endpoints
     fees_tournament: {
-      url: "/fees/tournament/:tournamentId",
+      url: "/api/fees/tournament/:tournamentId",
       methods: "GET",
     },
     fees_balance: {
-      url: "/fees/tournament/:tournamentId/balance",
+      url: "/api/fees/tournament/:tournamentId/balance",
       methods: "GET",
     },
     create_fee: {
-      url: "/fees",
+      url: "/api/fees",
       methods: "POST",
     },
   }),

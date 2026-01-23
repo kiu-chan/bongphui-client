@@ -3,15 +3,15 @@ import { defineStore } from "pinia";
 export const useNewStore = defineStore("Import", {
   state: () => ({
     getNew: {
-      url: "/news",
+      url: "/api/news",
       methods: "POST",
     },
     getNewHighlight: {
-      url: "/news/highlights",
+      url: "/api/news/highlights",
       methods: "GET",
     },
     getNewDetail: {
-      url: "/news/detail/:id",
+      url: "/api/news/detail/:id",
       methods: "GET",
     },
   }),

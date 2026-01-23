@@ -4,47 +4,47 @@ import type { TeamType } from "../types/team";
 export const useTeamStore = defineStore("Teams", {
   state: () => ({
     listPlayer: {
-      url: "/teams/:teamId/players",
+      url: "/api/teams/:teamId/players",
       methods: "GET",
     },
     list_team: {
-      url: "/teams",
+      url: "/api/teams",
       methods: "GET",
     },
     list_teamName: {
-      url: "/teams/names",
+      url: "/api/teams/names",
       methods: "GET",
     },
     add_team: {
-      url: "/teams",
+      url: "/api/teams",
       methods: "POST",
     },
     del_team: {
-      url: "/teams/:id",
+      url: "/api/teams/:id",
       methods: "DELETE",
     },
     detail_team: {
-      url: "/teams/:id",
+      url: "/api/teams/:id",
       methods: "GET",
     },
     update_team: {
-      url: "/teams/:id",
+      url: "/api/teams/:id",
       methods: "PUT",
     },
     listLineup: {
-      url: "/teams/:id/lineup",
+      url: "/api/teams/:id/lineup",
       methods: "GET",
     },
     swapLineup: {
-      url: "/teams/swap-position",
+      url: "/api/teams/swap-position",
       methods: "POST",
     },
     filterTeam: {
-      url: "/teams/filter",
+      url: "/api/teams/filter",
       methods: "GET",
     },
     leaveTeam: {
-      url: "/teams/leave",
+      url: "/api/teams/leave",
       method: "POST",
     },
   }),
@@ -52,7 +52,7 @@ export const useTeamStore = defineStore("Teams", {
     async fnGetListPlayer(id: number, url: string) {
       const { $api } = useNuxtApp();
       return await $api.get(
-        `${this.listPlayer.url.replaceAll(":teamId", id)}${url}`
+        `${this.listPlayer.url.replaceAll(":teamId", String(id))}${url}`
       );
     },
     async fnGetTeam(url: string) {

@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 export const usePlayerStore = defineStore("player", {
   state: () => ({
     list_PlayerMatch: {
-      url: "/players/by-match/:matchId",
+      url: "/api/players/by-match/:matchId",
       methods: "GET",
     },
   }),

@@ -3,43 +3,43 @@ import { defineStore } from "pinia";
 export const useMatchStore = defineStore("Match", {
   state: () => ({
     match_score: {
-      url: "/matches/scores/:id",
+      url: "/api/matches/scores/:id",
       methods: "PUT",
     },
     match_status: {
-      url: "/matches/status/:id",
+      url: "/api/matches/status/:id",
       methods: "PUT",
     },
     match_player: {
-      url: "/matches/:matchId/player/:playerId/statistic",
+      url: "/api/matches/:matchId/player/:playerId/statistic",
       methods: "GET",
     },
     player_Manager: {
-      url: "/matches/players/:id",
+      url: "/api/matches/players/:id",
       methods: "GET",
     },
     match_UpdatePlayer: {
-      url: "/matches/:matchId/player/player/update-statistic",
+      url: "/api/matches/:matchId/player/player/update-statistic",
       methods: "PUT",
     },
     match_update: {
-      url: "/matches/update/:id",
+      url: "/api/matches/update/:id",
       methods: "PUT",
     },
     match_new: {
-      url: "/matches/newest",
+      url: "/api/matches/newest",
       methods: "GET",
     },
     matches_newTeam: {
-      url: "/matches/team/newest/:teamId",
+      url: "/api/matches/team/newest/:teamId",
       methods: "GET",
     },
     matches_Schedule: {
-      url: "/matches/schedule/:id",
+      url: "/api/matches/schedule/:id",
       method: "GET",
     },
     matches_detail: {
-      url: "/matches/:id",
+      url: "/api/matches/:id",
       method: "GET",
     },
   }),

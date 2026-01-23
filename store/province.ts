@@ -3,11 +3,11 @@ import { defineStore } from "pinia";
 export const useProvinceStore = defineStore("province", {
   state: () => ({
     getProvince: {
-      url: "/provinces/provinces",
+      url: "/api/provinces/provinces",
       methods: "GET",
     },
     getProvinceWar: {
-      url: "/provinces/wards/:id",
+      url: "/api/provinces/wards/:id",
     },
   }),
   actions: {

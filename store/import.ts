@@ -3,27 +3,27 @@ import { defineStore } from "pinia";
 export const useImportStore = defineStore("Import", {
   state: () => ({
     import_logoTeam: {
-      url: "/import/upload-image",
+      url: "/api/import/upload-image",
       methods: "POST",
     },
     import_Team: {
-      url: "/import/import-players",
+      url: "/api/import/import-players",
       methods: "POST",
     },
     import_tkgoals: {
-      url: "/import/statistics/tournament/:tournamentId/goals",
+      url: "/api/import/statistics/tournament/:tournamentId/goals",
       methods: "GET",
     },
     import_tkassists: {
-      url: "/import/statistics/tournament/:tournamentId/assists",
+      url: "/api/import/statistics/tournament/:tournamentId/assists",
       methods: "GET",
     },
     import_tkcard: {
-      url: "/import/statistics/tournament/:tournamentId/card",
+      url: "/api/import/statistics/tournament/:tournamentId/card",
       methods: "GET",
     },
     import_TournamentFile: {
-      url: "/import/upload-excel",
+      url: "/api/import/upload-excel",
       methods: "POST",
     },
   }),

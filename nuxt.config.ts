@@ -19,7 +19,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBase:
-        process.env.NUXT_PUBLIC_APP_API_URL || "http://localhost:8080/api/",
+        process.env.NUXT_PUBLIC_APP_API_URL || "http://localhost:8080/",
       timeout: parseInt(process.env.NUXT_PUBLIC_APP_TIMEOUT || "5000"),
     },
   },

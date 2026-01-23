@@ -3,11 +3,11 @@ import { defineStore } from "pinia";
 export const useLeagueStore = defineStore("League", {
   state: () => ({
     list_league: {
-      url: "/leagues/tournament/:tournamentId",
+      url: "/api/leagues/tournament/:tournamentId",
       methods: "GET",
     },
     list_leagueMatchs: {
-      url: "/leagues/:id/matches",
+      url: "/api/leagues/:id/matches",
       methods: "GET",
     },
   }),
