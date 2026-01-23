@@ -1,5 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import tailwindcss from "@tailwindcss/vite";
+// import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: "2025-05-15",
   devtools: { enabled: true },
@@ -19,12 +19,20 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBase:
-        process.env.NUXT_PUBLIC_APP_API_URL || "http://103.147.35.53:3005/api/",
+        process.env.NUXT_PUBLIC_APP_API_URL || "http://localhost:8080/api/",
       timeout: parseInt(process.env.NUXT_PUBLIC_APP_TIMEOUT || "5000"),
     },
   },
   vite: {
     assetsInclude: ["**/*.xlsx"],
-    plugins: [tailwindcss()],
+    // plugins: [tailwindcss()],
   },
+  app: {
+    head: {
+      meta: [
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' },
+        { charset: 'utf-8' }
+      ]
+    }
+  }
 });

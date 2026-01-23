@@ -1,4 +1,4 @@
 export const config = {
-    APP_API_URL: process.env.NUXT_API_URL || 'http://103.147.35.53:3005/api/',
+    APP_API_URL: process.env.NUXT_API_URL || 'http://localhost:8080/api/',
     APP_TIMEOUT: process.env.NUXT_TIMEOUT,
 };

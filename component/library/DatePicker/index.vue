@@ -10,6 +10,8 @@
       type="date"
       name="text"
       v-model="inputValue"
+      ref="dateInput"
+      @click="openDatePicker"
       class="input mt-4"
     />
   </div>
@@ -33,8 +35,14 @@ export default defineComponent({
       get: () => props.modelValue,
       set: (value: string) => emit("update:modelValue", value),
     });
+    const dateInput = ref<HTMLInputElement | null>(null);
+    const openDatePicker = () => {
+      dateInput.value?.showPicker();
+    };
     return {
       inputValue,
+      openDatePicker,
+      dateInput,
     };
   },
 });

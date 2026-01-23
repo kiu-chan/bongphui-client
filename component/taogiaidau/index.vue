@@ -50,9 +50,7 @@ import championLeague from "../../assets/img/championLeague (2).png";
 import { headerLeague } from "../../utils/headerLeague";
 
 const { stt } = defineProps<{ stt: number }>();
-onMounted(() => {
-  console.log(stt, "chính");
-});
+onMounted(() => {});
 // const route = useRoute();
 </script>
 

@@ -35,6 +35,15 @@
             <option value="khongDK">Không đăng ký</option>
           </select>
           <button @click="refresh" class="px-3 py-2 bg-white border rounded-md text-sm hover:bg-gray-50">Làm mới</button>
+
+          <!-- Manual add button (+) - round and visually prominent -->
+          <button
+            @click="openManualModal"
+            title="Thêm thành viên thủ công"
+            class="ml-2 inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg"
+          >
+            <span class="text-2xl leading-none font-bold">+</span>
+          </button>
         </div>
       </div>
 
@@ -111,7 +120,9 @@
             </div>
 
             <div class="p-3 border-t bg-gray-50 flex items-center justify-between">
-              <div class="text-xs text-gray-500">Nguồn: <span class="font-medium">{{ p.source }}</span></div>
+              <!-- Removed the "Nguồn" line as requested -->
+              <div></div>
+
               <div class="flex items-center gap-2">
                 <button @click="openPlayer(p)" class="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Xem</button>
 
@@ -141,22 +152,49 @@
         </div>
       </div>
     </section>
+
+    <!-- Manual add modal -->
+    <div v-if="manualModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div class="bg-white rounded-lg max-w-lg w-full p-6">
+        <h3 class="font-semibold text-lg mb-4">Thêm thành viên thủ công</h3>
+        <div class="space-y-3">
+          <div>
+            <label class="block text-sm text-gray-600 mb-1">Tên</label>
+            <input v-model="manualForm.name" class="w-full px-3 py-2 border rounded" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-600 mb-1">CCCD</label>
+            <input v-model="manualForm.cccd" class="w-full px-3 py-2 border rounded" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-600 mb-1">SĐT</label>
+            <input v-model="manualForm.phoneNumber" class="w-full px-3 py-2 border rounded" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-600 mb-1">Số áo</label>
+            <input v-model.number="manualForm.shirt_number" type="number" class="w-full px-3 py-2 border rounded" />
+          </div>
+        </div>
+
+        <div class="mt-4 flex justify-end gap-3">
+          <button @click="closeManualModal" class="px-4 py-2 border rounded">Hủy</button>
+          <button @click="addManualMember" :disabled="manualAdding" class="px-4 py-2 bg-green-500 text-white rounded">
+            <span v-if="manualAdding">Đang thêm...</span>
+            <span v-else>Thêm</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </main>
 </template>
 
 <script setup lang="ts">
 /**
- * Full players page with:
- * - fetch /players/by-team/{teamId}
- * - fetch /tournaments/{tournamentId}/teams/{teamId}/members (special-case 500 => "no members registered")
- * - merge both sources and mark status: raSan / tuDo / khongDK
- * - add single member (POST)
- * - remove member (DELETE)
- * - add all members (bulk)
- * - search + filter by status
- * - debug snippet when responses are unexpected
- *
- * Paste this file to: pages/tournaments/[id]/teams/[teamId]/players.vue
+ * Updated players-list.vue:
+ * - POST to /tournaments/{tournamentId}/teams/{teamId}/members no longer sends id field.
+ * - Manual '+' modal to add a free member (no id) with fields name, cccd, phoneNumber, shirt_number.
+ * - Removed "Nguồn" line from card footer.
+ * - Deduplicate members when merging: if duplicate by id or cccd or (name+shirt_number) then show only one.
  */
 
 import { ref, onMounted, watch, computed } from 'vue';
@@ -167,9 +205,9 @@ const route = useRoute();
 const router = useRouter();
 const { $api } = useNuxtApp();
 
-// Optional toast if project provides one
+// Optional toast helper
 let toast: any = null;
-try { toast = useToast(); } catch { /* ignore if not present */ }
+try { toast = useToast(); } catch { /* ignore */ }
 
 const tournamentId = Number(route.params.id || 0);
 const teamId = Number(route.params.teamId || 0);
@@ -190,8 +228,18 @@ const addingIds = ref(new Set<string|number>());
 const removingIds = ref(new Set<string|number>());
 const addingAll = ref(false);
 
-const idKey = (p: any) => p?.id ?? p?.playerId ?? p?.cccd ?? p?._uid ?? JSON.stringify(p);
+const manualModalOpen = ref(false);
+const manualAdding = ref(false);
+const manualForm = ref({
+  name: '',
+  cccd: '',
+  phoneNumber: '',
+  shirt_number: null as number | null,
+});
 
+const idKey = (p: any) => p?.id ?? p?.playerId ?? p?.cccd ?? `${(p?.name||'')}-${(p?.shirt_number ?? p?.shirtNumber ?? '')}`;
+
+/* normalize response to array */
 function extractArray(payload: any): any[] {
   if (!payload) return [];
   if (Array.isArray(payload)) return payload;
@@ -199,18 +247,21 @@ function extractArray(payload: any): any[] {
   if (Array.isArray(payload.result)) return payload.result;
   if (payload.data && Array.isArray(payload.data.data)) return payload.data.data;
   if (payload.data && Array.isArray(payload.data.result)) return payload.data.result;
-  // find first array prop
-  for (const k of Object.keys(payload)) {
+  for (const k of Object.keys(payload || {})) {
     if (Array.isArray(payload[k])) return payload[k];
   }
   return [];
 }
 
 async function fetchTeamPlayers(tid: number | string) {
-  const res = await $api.get(`/players/by-team/${tid}`);
-  responseRaw.value = responseRaw.value ?? {};
-  responseRaw.value.teamPlayers = res;
-  teamPlayers.value = extractArray(res);
+  try {
+    const res = await $api.get(`/players/by-team/${tid}`);
+    responseRaw.value = responseRaw.value ?? {};
+    responseRaw.value.teamPlayers = res;
+    teamPlayers.value = extractArray(res);
+  } catch (e) {
+    teamPlayers.value = [];
+  }
 }
 
 async function fetchTournamentMembers(tourId: number | string, tid: number | string) {
@@ -225,7 +276,6 @@ async function fetchTournamentMembers(tourId: number | string, tid: number | str
     responseRaw.value = responseRaw.value ?? {};
     responseRaw.value.tournamentMembersError = e?.response?.data ?? e?.message ?? String(e);
     if (status === 500) {
-      // interpret 500 as "no members registered" (per backend behavior you described)
       tournamentMembers.value = [];
       noMembersInTournament.value = true;
     } else {
@@ -237,55 +287,101 @@ async function fetchTournamentMembers(tourId: number | string, tid: number | str
   }
 }
 
+/* Merge and deduplicate: prefer id > cccd > name+shirt */
 function buildCombined() {
-  const mapTeam = new Map<string, any>();
-  teamPlayers.value.forEach((p) => {
-    const k = p?.id != null ? String(p.id) : p?.playerId != null ? String(p.playerId) : null;
-    if (k) mapTeam.set(k, p);
-    if (p?.cccd) mapTeam.set(`cccd:${String(p.cccd)}`, p);
-  });
+  const map = new Map<string, any>();
 
-  const resultMap = new Map<string, any>();
+  // helper to compute keys
+  const keyFor = (p: any) => {
+    if (p == null) return null;
+    if (p.id != null) return `id:${p.id}`;
+    if (p.playerId != null) return `id:${p.playerId}`;
+    if (p.cccd) return `cccd:${p.cccd}`;
+    // fallback to name+shirt (normalize)
+    const name = (p.name || '').toString().trim().toLowerCase();
+    const shirt = String(p.shirt_number ?? p.shirtNumber ?? '');
+    return `ns:${name}|${shirt}`;
+  };
 
-  tournamentMembers.value.forEach((m) => {
-    const idKeyM = m?.id != null ? String(m.id) : m?.playerId != null ? String(m.playerId) : null;
-    const cKey = m?.cccd ? `cccd:${String(m.cccd)}` : null;
-    const teamEntry = (idKeyM && mapTeam.get(idKeyM)) || (cKey && mapTeam.get(cKey));
-    const merged = {
-      ...teamEntry,
+  // first add tournamentMembers (they should be considered primary for status)
+  (tournamentMembers.value || []).forEach((m: any) => {
+    const k = keyFor(m) || `tmp:${Math.random().toString(36).slice(2,9)}`;
+    const entry = {
       ...m,
-      id: m.id ?? m.playerId ?? (teamEntry && (teamEntry.id ?? teamEntry.playerId)),
-      name: m.name ?? (teamEntry && teamEntry.name),
-      cccd: m.cccd ?? (teamEntry && teamEntry.cccd),
-      phoneNumber: m.phoneNumber ?? (teamEntry && teamEntry.phoneNumber),
-      shirt_number: m.shirt_number ?? m.shirtNumber ?? (teamEntry && (teamEntry.shirt_number ?? teamEntry.shirtNumber)),
-      status: teamEntry ? 'raSan' : 'tuDo',
-      source: teamEntry ? 'Team & Tournament' : 'Tournament only',
-      _uid: `t_${Math.random().toString(36).slice(2,9)}`,
+      id: m.id ?? m.playerId,
+      name: m.name,
+      cccd: m.cccd,
+      phoneNumber: m.phoneNumber,
+      shirt_number: m.shirt_number ?? m.shirtNumber,
+      status: 'tuDo', // will adjust if roster matches
+      source: 'Tournament only',
     };
-    resultMap.set(String(merged.id ?? merged.cccd ?? merged._uid), merged);
+    map.set(k, entry);
   });
 
-  teamPlayers.value.forEach((p) => {
-    const keyById = p?.id != null ? String(p.id) : p?.playerId != null ? String(p.playerId) : null;
-    const keyByCccd = p?.cccd ? `cccd:${String(p.cccd)}` : null;
-    if ((keyById && resultMap.has(keyById)) || (keyByCccd && resultMap.has(keyByCccd))) return;
-    const merged = {
-      ...p,
-      id: p.id ?? p.playerId,
-      name: p.name,
-      cccd: p.cccd,
-      phoneNumber: p.phoneNumber,
-      shirt_number: p.shirt_number ?? p.shirtNumber,
-      status: 'khongDK',
-      source: 'Team roster only',
-      _uid: `r_${Math.random().toString(36).slice(2,9)}`,
-    };
-    resultMap.set(String(merged.id ?? merged.cccd ?? merged._uid), merged);
+  // then incorporate roster players: if exist in map, mark as raSan; otherwise add as khongDK
+  (teamPlayers.value || []).forEach((p: any) => {
+    const k = keyFor(p) || `tmp:${Math.random().toString(36).slice(2,9)}`;
+    const existing = map.get(k);
+    if (existing) {
+      // merge roster fields and mark as raSan
+      map.set(k, {
+        ...existing,
+        ...p,
+        id: existing.id ?? p.id ?? p.playerId,
+        name: existing.name ?? p.name,
+        cccd: existing.cccd ?? p.cccd,
+        phoneNumber: existing.phoneNumber ?? p.phoneNumber,
+        shirt_number: existing.shirt_number ?? p.shirt_number ?? p.shirtNumber,
+        status: 'raSan',
+        source: 'Team & Tournament',
+      });
+    } else {
+      // maybe map contains same person by other key (e.g., tournament had id but roster uses cccd)
+      // attempt to find by id or cccd
+      let foundKey: string | undefined;
+      for (const [mk, mv] of map.entries()) {
+        if (mv && ( (mv.id && (p.id && String(mv.id)===String(p.id))) || (mv.cccd && p.cccd && String(mv.cccd)===String(p.cccd)) )) {
+          foundKey = mk;
+          break;
+        }
+      }
+      if (foundKey) {
+        const existing2 = map.get(foundKey);
+        map.set(foundKey, {
+          ...existing2,
+          ...p,
+          id: existing2.id ?? p.id ?? p.playerId,
+          name: existing2.name ?? p.name,
+          cccd: existing2.cccd ?? p.cccd,
+          phoneNumber: existing2.phoneNumber ?? p.phoneNumber,
+          shirt_number: existing2.shirt_number ?? p.shirt_number ?? p.shirtNumber,
+          status: 'raSan',
+          source: 'Team & Tournament',
+        });
+      } else {
+        map.set(k, {
+          ...p,
+          id: p.id ?? p.playerId,
+          name: p.name,
+          cccd: p.cccd,
+          phoneNumber: p.phoneNumber,
+          shirt_number: p.shirt_number ?? p.shirtNumber,
+          status: 'khongDK',
+          source: 'Team roster only',
+        });
+      }
+    }
   });
 
-  const arr = Array.from(resultMap.values());
-  arr.sort((a,b) => (Number(a.shirt_number ?? a.shirtNumber ?? 999) - Number(b.shirt_number ?? b.shirtNumber ?? 999)));
+  // Convert map to array and sort by shirt_number
+  const arr = Array.from(map.values());
+  arr.sort((a: any, b: any) => {
+    const na = Number(a.shirt_number ?? a.shirtNumber ?? 999);
+    const nb = Number(b.shirt_number ?? b.shirtNumber ?? 999);
+    return na - nb;
+  });
+
   membersCombined.value = arr;
 }
 
@@ -343,21 +439,28 @@ const openPlayer = (p: any) => console.log('Open player', p);
 const goBack = () => router.back();
 const refresh = () => fetchAll();
 
+/**
+ * NOTE: API change:
+ * - POST /tournaments/{tournamentId}/teams/{teamId}/members no longer expects an "id" field.
+ * - We'll send only: { name, cccd, phoneNumber, shirt_number } for both manual adds and roster adds.
+ */
+
 async function addMember(player: any) {
   const key = idKey(player);
   if (!key) return;
   if (addingIds.value.has(key)) return;
   addingIds.value.add(key);
-  const payload = {
-    id: player.id ?? player.playerId,
+
+  // Build payload WITHOUT id
+  const payload: any = {
     name: player.name,
     cccd: player.cccd,
-    phoneNumber: player.phoneNumber,
+    phoneNumber: player.phoneNumber ?? player.phone,
     shirt_number: player.shirt_number ?? player.shirtNumber,
   };
+
   try {
     await $api.post(`/tournaments/${tournamentId}/teams/${teamId}/members`, payload);
-    // refresh to reflect canonical server state
     await fetchAll();
     toast?.success?.({ message: 'Thêm thành viên vào đội trong giải đấu thành công', position: 'topRight' });
   } catch (e: any) {
@@ -397,10 +500,15 @@ async function addAllTeamMembers() {
   const added: string[] = [];
   const failed: string[] = [];
   for (const p of teamPlayers.value) {
-    const key = p.id ?? p.playerId ?? p.cccd;
+    const key = p.id ?? p.playerId ?? p.cccd ?? `${(p.name||'')}-${(p.shirt_number ?? p.shirtNumber ?? '')}`;
     if (!key) continue;
     addingIds.value.add(key);
-    const payload = { id: p.id ?? p.playerId, name: p.name, cccd: p.cccd, phoneNumber: p.phoneNumber, shirt_number: p.shirt_number ?? p.shirtNumber };
+    const payload = { // no id field
+      name: p.name,
+      cccd: p.cccd,
+      phoneNumber: p.phoneNumber,
+      shirt_number: p.shirt_number ?? p.shirtNumber,
+    };
     try {
       await $api.post(`/tournaments/${tournamentId}/teams/${teamId}/members`, payload);
       added.push(String(key));
@@ -417,6 +525,39 @@ async function addAllTeamMembers() {
   await fetchAll();
 }
 function onAddAllConfirm() { addAllTeamMembers(); }
+
+/* Manual add modal handlers */
+function openManualModal() {
+  manualForm.value = { name: '', cccd: '', phoneNumber: '', shirt_number: null };
+  manualModalOpen.value = true;
+}
+function closeManualModal() {
+  manualModalOpen.value = false;
+}
+async function addManualMember() {
+  if (!manualForm.value.name || !manualForm.value.cccd) {
+    toast?.error?.({ message: 'Vui lòng nhập tên và CCCD', position: 'topRight' });
+    return;
+  }
+  manualAdding.value = true;
+  const payload = {
+    name: manualForm.value.name,
+    cccd: manualForm.value.cccd,
+    phoneNumber: manualForm.value.phoneNumber || '',
+    shirt_number: manualForm.value.shirt_number ?? undefined,
+  };
+  try {
+    await $api.post(`/tournaments/${tournamentId}/teams/${teamId}/members`, payload);
+    toast?.success?.({ message: 'Thêm thành viên vào đội trong giải đấu thành công', position: 'topRight' });
+    manualModalOpen.value = false;
+    await fetchAll();
+  } catch (e: any) {
+    console.error('addManualMember error', e);
+    toast?.error?.({ message: e?.message || 'Thêm thành viên thất bại', position: 'topRight' });
+  } finally {
+    manualAdding.value = false;
+  }
+}
 </script>
 
 <style scoped>

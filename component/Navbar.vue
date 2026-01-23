@@ -1,10 +1,57 @@
+<script lang="ts">
+import { ref, type Ref } from "vue";
+import { headerLeague } from "../utils/header";
+import SideBar from "./SideBar.vue";
+import defaultBanner from "../assets/img/2023.2.24-Crop-Football-Kid-An-2-copy-2 1.png";
+import defaultBanner2 from "../assets/img/vietnam.png";
+
+export default defineComponent({
+  components: { SideBar },
+  setup() {
+    const Route = useRoute();
+    const openSideBar: Ref<boolean> = ref(false);
+    const banner: Ref<string> = ref(defaultBanner);
+    const item: { id: number; img: string }[] = [
+      { id: 1, img: defaultBanner },
+      { id: 2, img: defaultBanner2 },
+      { id: 3, img: defaultBanner },
+      { id: 4, img: defaultBanner2 },
+    ];
+
+    const handelRouter = (item) => {
+      console.log(item, "item");
+    };
+
+    // --- Kết thúc Logic Sửa Lỗi ---
+
+    const handleClick = () => {
+      openSideBar.value = true;
+      document.body.classList.add("overflow-hidden");
+    };
+
+    const handelBaner = (ite: number) => {
+      banner.value = item.find((i) => i.id == ite)?.img || "";
+    };
+
+    return {
+      handleClick,
+      headerLeague,
+      openSideBar,
+      item,
+      Route,
+      handelRouter,
+      banner,
+      handelBaner,
+    };
+  },
+});
+</script>
+
 <template>
   <header class="headerNavbar w-full flex justify-center h-[120px]">
-    <!-- Navbar -->
     <div
       class="flex justify-between app-container container items-center header-overlay"
     >
-      <!-- Logo -->
       <NuxtLink to="/">
         <div class="flex gap-2 items-center">
           <img
@@ -15,7 +62,6 @@
         </div>
       </NuxtLink>
 
-      <!-- Menu -->
       <ul class="flex gap-8 lg:flex">
         <li
           v-for="item in headerLeague"
@@ -27,7 +73,6 @@
               class="flex h-[40px] items-center gap-[10px] pt-2 pr-4 pb-2 pl-2"
               :class="{ 'gap-[20px]': item.id === 4 }"
             >
-              <!-- Icon trước nếu id === 5 -->
               <Icon
                 v-if="item.id === 5"
                 :name="item.iconName || ''"
@@ -38,15 +83,15 @@
 
               <h2
                 :style="{
-                  color: idDefault === item.id ? 'rgba(247, 163, 39, 1)' : '',
+                  color:
+                    Route.path == item.router ? 'rgba(247, 163, 39, 1)' : '',
                 }"
-                @click="idDefault = item.id"
+                @click="handelRouter(item)"
                 class="text-title font-medium text-[20px]"
               >
                 {{ item.title }}
               </h2>
 
-              <!-- Icon sau nếu id === 4 -->
               <Icon
                 v-if="item.id === 4"
                 :name="item.iconName || ''"
@@ -58,130 +103,11 @@
           </NuxtLink>
         </li>
       </ul>
-
-      <!-- Actions -->
-      <!-- <div class="flex items-center gap-4">
-          <NuxtLink><p>Liên Hệ</p></NuxtLink>
-          <NuxtLink to="/auth/login"><p>Đăng Nhập</p></NuxtLink>
-          <div
-            @click="handleClick"
-            class="lg:hidden w-[40px] h-[40px] rounded-full flex justify-center items-center border border-[hsl(137_100%_21%)]"
-          >
-            <Icon
-              class="w-[24px] h-[24px]"
-              name="hugeicons:menu-07"
-              width="48"
-              height="48"
-            />
-          </div>
-        </div> -->
     </div>
-
-    <!-- Banner -->
-    <!-- <div class="banner">
-      <div class="grid grid-cols-10 absolute top-[76px]">
-        <div class="col-span-4 mt-[136px]">
-          <div class="flex items-center">
-            <div class="w-[120px] flex justify-center">
-              <ul>
-                <template v-for="(ite, index) in item" :key="index">
-                  <li
-                    :class="[idDefault === ite.id ? 'idSlide' : '']"
-                    style="
-                      color: rgba(108, 127, 246, 1);
-                      transition: all 0.4s ease;
-                    "
-                    class="font-medium text-[20px] mb-[4px] cursor-pointer flex justify-center"
-                    @click="handelBaner(ite.id)"
-                  >
-                    0{{ ite.id }}
-                  </li>
-                </template>
-              </ul>
-            </div>
-            <div>
-              <h3
-                style="color: rgba(247, 163, 39, 1)"
-                class="font-medium text-[50px]"
-              >
-                Giải đấu việt
-              </h3>
-              <h1
-                style="color: rgba(245, 245, 245, 1)"
-                class="font-bold text-[70px]"
-              >
-                NÂNG TẦM <br />
-                THỂ THAO VIỆT
-              </h1>
-            </div>
-          </div>
-        </div>
-        <div class="col-span-6 max-w-[981px] max-h-[860px]">
-          <img
-            class="bannerImg w-full h-full contain"
-            :key="banner"
-            :src="banner"
-            alt=""
-          />
-        </div>
-      </div>
-    </div> -->
   </header>
 
   <SideBar :openSideBar="openSideBar" @close="openSideBar = false" />
 </template>
-
-<script lang="ts">
-import { ref, defineComponent, type Ref } from "vue";
-import { headerLeague } from "../utils/header";
-import SideBar from "./SideBar.vue";
-import defaultBanner from "../assets/img/2023.2.24-Crop-Football-Kid-An-2-copy-2 1.png";
-import defaultBanner2 from "../assets/img/vietnam.png";
-
-export default defineComponent({
-  components: { SideBar },
-  setup() {
-    const openSideBar: Ref<boolean> = ref(false);
-    const idDefault: Ref<number> = ref(1);
-    const banner: Ref<string> = ref(defaultBanner);
-    const item: { id: number; img: string }[] = [
-      {
-        id: 1,
-        img: defaultBanner,
-      },
-      {
-        id: 2,
-        img: defaultBanner2,
-      },
-      {
-        id: 3,
-        img: defaultBanner,
-      },
-      {
-        id: 4,
-        img: defaultBanner2,
-      },
-    ];
-    const handleClick = () => {
-      openSideBar.value = true;
-      document.body.classList.add("overflow-hidden");
-    };
-    const handelBaner = (ite: number) => {
-      idDefault.value = ite;
-      banner.value = item.find((i) => i.id == ite)?.img || "";
-    };
-    return {
-      handleClick,
-      headerLeague,
-      openSideBar,
-      item,
-      idDefault,
-      banner,
-      handelBaner,
-    };
-  },
-});
-</script>
 
 <style scoped>
 .header-overlay {

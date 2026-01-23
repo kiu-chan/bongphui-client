@@ -10,7 +10,7 @@
     <div
       style="overflow: auto"
       :style="{
-        height: 700 + 'px',
+        height: 550 + 'px',
       }"
     >
       <div class="p-5 max-h-[60vh] grid grid-cols-1 gap-8">
@@ -93,7 +93,6 @@ export default defineComponent({
     });
     watch(keyword, (_new) => {
       if (_new) {
-        console.log(_new, "111");
         fnGetFillteam();
       }
     });

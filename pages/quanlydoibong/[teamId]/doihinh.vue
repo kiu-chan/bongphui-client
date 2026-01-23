@@ -291,7 +291,6 @@ export default defineComponent({
     };
     const handlePositionNumber = (item) => {
       PositionNumber.value = item;
-      console.log(item);
     };
     const squadRef = ref(null);
 

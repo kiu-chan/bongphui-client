@@ -49,7 +49,6 @@ export default defineComponent({
     });
     watch(status, (_new) => {
       if (_new) {
-        console.log(status.value, "chính");
       }
     });
 

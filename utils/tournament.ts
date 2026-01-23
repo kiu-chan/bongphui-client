@@ -26,15 +26,15 @@ export const RankingRules = [
 ];
 export const hinhthuc = [
   {
-    id: 1,
+    id: 0,
     name: "Vòng tròn",
   },
   {
-    id: 2,
+    id: 1,
     name: "Tranh cúp",
   },
   {
-    id: 3,
+    id: 2,
     name: "Loại trực tiếp",
   },
 ];
@@ -75,6 +75,14 @@ export const dachinh = [
     id: 9,
     name: "9",
   },
+  {
+    id: 10,
+    name: "10",
+  },
+  {
+    id: 11,
+    name: "11",
+  },
 ];
 export const daPhu = [
   {
@@ -113,118 +121,94 @@ export const daPhu = [
     id: 9,
     name: "9",
   },
+  {
+    id: 10,
+    name: "10",
+  },
+  {
+    id: 11,
+    name: "11",
+  },
 ];
 export const winscore = [
   {
-    id: 1,
-    name: "1",
+    id: "1",
+    name: "0",
   },
   {
     id: 2,
-    name: "2",
+    name: "1",
   },
   {
     id: 3,
-    name: "3",
+    name: "2",
   },
   {
     id: 4,
-    name: "4",
+    name: "3",
   },
   {
     id: 5,
-    name: "5",
+    name: "4",
   },
   {
     id: 6,
-    name: "6",
-  },
-  {
-    id: 7,
-    name: "7",
-  },
-  {
-    id: 8,
-    name: "8",
-  },
-  {
-    id: 9,
-    name: "9",
+    name: "5",
   },
 ];
 export const losescore = [
   {
-    id: 1,
-    name: "1",
+    id: "1",
+    name: "0",
   },
   {
     id: 2,
-    name: "2",
+    name: "1",
   },
   {
     id: 3,
-    name: "3",
+    name: "2",
   },
   {
     id: 4,
-    name: "4",
+    name: "3",
   },
   {
     id: 5,
-    name: "5",
+    name: "4",
   },
   {
     id: 6,
-    name: "6",
-  },
-  {
-    id: 7,
-    name: "7",
-  },
-  {
-    id: 8,
-    name: "8",
-  },
-  {
-    id: 9,
-    name: "9",
+    name: "5",
   },
 ];
 export const drawscore = [
   {
-    id: 1,
-    name: "1",
+    id: "1",
+    name: "0",
   },
   {
     id: 2,
-    name: "2",
+    name: "1",
   },
   {
     id: 3,
-    name: "3",
+    name: "2",
   },
   {
     id: 4,
-    name: "4",
+    name: "3",
   },
   {
     id: 5,
-    name: "5",
+    name: "4",
   },
   {
     id: 6,
-    name: "6",
+    name: "5",
   },
   {
     id: 7,
-    name: "7",
-  },
-  {
-    id: 8,
-    name: "8",
-  },
-  {
-    id: 9,
-    name: "9",
+    name: "6",
   },
 ];

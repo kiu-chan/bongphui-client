@@ -6,42 +6,41 @@
     @toggle="$emit('toggle')"
     @success="fnAddTeams()"
   >
-    <div class="p-5 grid grid-cols-4 gap-8">
-      <dateTimePicker
+    <div class="p-5 grid grid-cols-2 gap-8">
+      <InputForm
         class="col-span-1"
-        :name="'Thời gian thi đấu của 2 đội'"
-        v-model="matchDateTime"
+        :name="awayName"
+        :placeHolder="'Tỉ số đội ' + awayName"
+        v-model="awayScore"
       />
-      <SelectNebula class="col-span-1" 
-        :name="'MVP của trận đấu'"
-        v-model="mvpPlayerId"
-        :statusMatch="mvpPLayer"/>
-      <inputNebula class="col-span-1" :name="'Địa điểm'"  />
-      <inputNebula
+
+      <InputForm
         class="col-span-1"
-        :name="'Trọng tài bắt chính'"
-        v-model="refereeName"
+        :name="homeName"
+        :placeHolder="'Tỉ số đội ' + homeName"
+        v-model="homeScore"
       />
     </div>
-    <div class="px-20 flex justify-center items-center">
-      <div class="grid grid-cols-5 gap-4">
-        <inputNebula class="col-span-2" :name="homeName" v-model="homeScore" />
-        <span
-          class="text-white font-semibold flex justify-center items-center text-xl col-span-1"
-          >vs</span
-        >
-        <inputNebula class="col-span-2" :name="awayName" v-model="awayScore" />
-      </div>
+    <div class="w-full flex justify-end p-5">
+      <SelectNebula
+        class="col-span-1"
+        :name="'MVP của trận đấu'"
+        v-model="mvpPlayerId"
+        :statusMatch="mvpPLayer"
+      />
     </div>
     <div class="p-5 grid grid-cols-2 gap-8">
       <div class="col-span-2 flex justify-center">DANH SÁCH THI ĐẤU</div>
       <div class="col-span-2 flex justify-around">
-        <h2>Đội : {{ homeName }}</h2>
         <h2>Đội : {{ awayName }}</h2>
+        <h2>Đội : {{ homeName }}</h2>
       </div>
       <div class="col-span-1">
-        <table class="min-w-full rounded-xl shadow">
-          <thead class="">
+        <table class="min-w-full rounded-xl shadow overflow-hidden">
+          <thead
+            style="background: linear-gradient(90deg, #e97552 0%, #a949cf 100%)"
+            class="text-white"
+          >
             <tr>
               <th class="px-4 py-2 text-center w-[100px]">Số áo</th>
               <th class="px-4 py-2">Họ và tên</th>
@@ -54,7 +53,7 @@
             </tr>
           </thead>
           <tbody>
-           <tr v-for="(item, index) in player1" :key="index">
+            <tr v-for="(item, index) in player1" :key="index">
               <td class="px-4 py-2">
                 <input
                   type="number"
@@ -79,7 +78,7 @@
               <td class="px-4 py-2">
                 <input
                   type="number"
-                  v-model.number="item.goals"
+                  v-model.number="item.totalGoals"
                   placeholder="stt"
                   class="w-full border-b focus:outline-none bg-transparent"
                 />
@@ -105,8 +104,11 @@
         </table>
       </div>
       <div class="col-span-1">
-        <table class="min-w-full rounded-xl shadow">
-          <thead class="">
+        <table class="min-w-full rounded-xl shadow overflow-hidden">
+          <thead
+            style="background: linear-gradient(90deg, #e97552 0%, #a949cf 100%)"
+            class="text-white"
+          >
             <tr>
               <th class="px-4 py-2 text-center w-[100px]">Số áo</th>
               <th class="px-4 py-2">Họ và tên</th>
@@ -176,7 +178,7 @@
           height: 700 + 'px',
         }"
       >
-        <inputNebula :name="'Tìm kiếm cầu thủ'" v-model="name" />
+        <InputForm :name="'Tìm kiếm cầu thủ'" v-model="name" />
         <div
           class="app-container container mx-auto mt-[58px] px-4 sm:px-6 md:mt-16 grid w-full gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 2xl:gap-8"
         >
@@ -219,19 +221,16 @@
         </div>
       </div> -->
     </div>
-    
   </popUpFull>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, toRefs, watch } from "vue";
 import popUpFull from "../../library/popupFull/index.vue";
-import inputNebula from "../../library/input/index.vue";
-import dateTimePicker from "../../library/dateTimePicker/index.vue";
+import InputForm from "../../library/input/index.vue";
 import SelectNebula from "../../library/selectNebula/index.vue";
 import { usePlayerStore } from "../../../store/player";
 import { useMatchStore } from "../../../store/matchManger";
-
 
 interface mvpPlayer {
   id: number;
@@ -252,6 +251,7 @@ interface Player {
 interface Goal {
   id: number;
   playerId: number;
+  playerName: string;
   teamId: number;
   goalTime: string;
   goalAssistPlayerId: number;
@@ -270,36 +270,40 @@ interface Card {
 
 interface PostBody {
   goals: Goal[];
-  yellowCard: Card[];
-  redCard: Card[];
-  mvp: number;
-  matchDateTime: string;
-  location: string;
-  refId: number;
+  cards: Card[];
+  mvpPlayerId: number;
+  teamWinner: number | null;
+  homeScore: number;
+  awayScore: number;
 }
 
 export default defineComponent({
   components: {
     popUpFull,
-    inputNebula,
-    dateTimePicker,
+    InputForm,
     SelectNebula,
   },
   props: {
     openPopup: Boolean,
-    id: Number,
-    homeName: String,
-    awayName: String,
+    StatusMatch: {
+      type: Array as PropType<
+        Array<{ id: number; homeTeam: string; awayTeam: string }>
+      >,
+      required: true,
+    },
   },
   emits: ["toggle", "success"],
   setup(props, ctx) {
-    const { openPopup, id } = toRefs(props);
+    const { openPopup, StatusMatch } = toRefs(props);
     const PlayerStore = usePlayerStore();
     const MatchStore = useMatchStore();
     const toast = useToast();
-
-    const homeScore = ref<number>();
-    const awayScore = ref<number>();
+    const homeScore = ref<number | undefined>();
+    const homeName: Ref<string> = ref("");
+    const awayName: Ref<string> = ref("");
+    const awayScore = ref<number | undefined>();
+    const homeId: Ref<number> = ref();
+    const awayId: Ref<number> = ref();
     const matchDateTime = ref<string>("");
     const refereeName = ref<string>("");
     const player1 = ref<Player[]>([]);
@@ -311,95 +315,117 @@ export default defineComponent({
 
     const postBody: PostBody = {
       goals: [],
-      yellowCard: [],
-      redCard: [],
-      mvp: 0,
-      matchDateTime: new Date().toISOString(),
-      location: location.value,
-      refId: 1,
+      cards: [],
+      mvpPlayerId: 0,
+      teamWinner: null,
+      homeScore: 0,
+      awayScore: 0,
     };
 
     watch(openPopup, (newVal) => {
-      if (newVal) fnGetPlayer();
+      if (newVal) {
+        fnGetPlayer();
+        fnMatchDetail();
+      }
     });
-
     const fnGetPlayer = () => {
-      PlayerStore.fnGetPlayerMatch(22)
-        .then((res: any) => {
-          player1.value = res.playerTeam1.map((p: any) => ({ ...p, teamId: res.team1Id }));
-          player2.value = res.playerTeam2.map((p: any) => ({ ...p, teamId: res.team2Id }));
-          allPlayers.value = [...player1.value, ...player2.value];
+      MatchStore.fnGetPlayerManger(StatusMatch.value.id)
+        .then((res) => {
+          const teamNames = Object.keys(res);
 
-          homeScore.value = res.homeScore;
-          awayScore.value = res.awayScore;
-          matchDateTime.value = res.matchDateTime;
-          refereeName.value = res.refereeName;
+          player1.value =
+            res[teamNames[0]].map((item) => {
+              return {
+                ...item,
+                teamId: awayId.value,
+              };
+            }) || [];
+          player2.value =
+            res[teamNames[1]].map((item) => {
+              return {
+                ...item,
+                teamId: homeId.value,
+              };
+            }) || [];
+          console.log(player1.value, "chinh1");
+          console.log(player2.value, "chinh2");
 
-          mvpPLayer.value = allPlayers.value.map((item) => ({
-            id: item.playerId,
-            name: item.name || ""
-          }));
+          // console.log(res, "chính");
         })
-        .catch((err) => console.error(err));
-    };
-
-    const fnAddTeams = () => {
-      postBody.mvp = mvpPlayerId.value ?? 0;
-      postBody.matchDateTime = matchDateTime.value;
-      postBody.location = location.value;
-
-      allPlayers.value.forEach((player) => {
-        const teamId = player.teamId ?? 0;
-
-        if (player.goals && Number(player.goals) > 0) {
-          postBody.goals.push({
-            id: 0,
-            playerId: player.playerId,
-            teamId,
-            goalTime: "",
-            goalAssistPlayerId: 0,
-            numberOfPlayer: player.numberOfPlayer,
-            reservePlayer: player.reservePlayer,
-          });
-        }
-
-        if (player.yellowCards && Number(player.yellowCards) > 0) {
-          postBody.yellowCard.push({
-            id: 0,
-            playerId: player.playerId,
-            cardTypeId: 1,
-            minuteGiven: "",
-            numberOfPlayer: player.numberOfPlayer,
-            reservePlayer: player.reservePlayer,
-          });
-        }
-
-        if (player.redCards && Number(player.redCards) > 0) {
-          postBody.redCard.push({
-            id: 0,
-            playerId: player.playerId,
-            cardTypeId: 2,
-            minuteGiven: "",
-            numberOfPlayer: player.numberOfPlayer,
-            reservePlayer: player.reservePlayer,
-          });
-        }
-      });
-
-      MatchStore.fnUpdateMatches(22, postBody)
-        .then(() => {
-          toast.success("Thêm dữ liệu thành công", { position: "topRight" });
-          ctx.emit("toggle");
-          ctx.emit("success");
-        })
-        .catch(() => {
-          toast.error("Thêm dữ liệu thất bại", { position: "topRight" });
+        .catch((err) => {
+          console.log(err);
         });
     };
 
+    const fnAddTeams = () => {
+      postBody.mvpPlayerId = mvpPlayerId.value ?? 2;
+      postBody.homeScore = Number(homeScore.value);
+      postBody.awayScore = Number(awayScore.value);
+      allPlayers.value = [...player1.value, ...player2.value];
+      console.log(postBody, "chínhdzzzz");
+      allPlayers.value.forEach((player) => {
+        const teamId = player.teamId ?? 0;
+
+        if (player.totalGoals && Number(player.totalGoals) > 0) {
+          postBody.goals.push({
+            id: 0,
+            playerName: player.name,
+            playerId: player?.player_id,
+            teamId,
+            goalTime: "",
+            goalAssistPlayerId: 0,
+            numberOfPlayer: player.numberOfPlayer ?? 0,
+            reservePlayer: player.reservePlayer ?? 0,
+          });
+        }
+
+        // if (player.redCards && Number(player.redCards) > 0) {
+        //   postBody.redCard.push({
+        //     id: 0,
+        //     playerId: player.playerId,
+        //     cardTypeId: 2,
+        //     minuteGiven: "",
+        //     numberOfPlayer: player.numberOfPlayer,
+        //     reservePlayer: player.reservePlayer,
+        //   });
+        // }
+      });
+
+      MatchStore.fnUpdateMatchesTeam(StatusMatch.value.id, postBody)
+        .then((res) => {
+          toast.success({
+            message: res,
+            position: "topRight",
+          });
+          ctx.emit("toggle");
+          ctx.emit("success");
+        })
+        .catch((err) => {
+          toast.success({
+            message: err,
+            position: "topRight",
+          });
+        });
+    };
+    const fnMatchDetail = () => {
+      MatchStore.fnMatchDetail(StatusMatch.value.id)
+        .then((res) => {
+          homeScore.value = res.homeScore;
+          awayScore.value = res.awayScore;
+          awayName.value = res.awayTeam.name;
+          homeName.value = res.homeTeam.name;
+          awayId.value = res.awayTeam.id;
+          homeId.value = res.homeTeam.id;
+        })
+        .catch((err) => {
+          console.log(err, "chính");
+        });
+    };
     return {
       openPlayer: ref(false),
       homeScore,
+      homeName,
+      awayName,
       awayScore,
       refereeName,
       matchDateTime,
@@ -424,9 +450,5 @@ th,
 td {
   border: 1px solid var(--textsport4);
   border-collapse: collapse;
-}
-.nebula-dark-select option {
-  background-color: #00000f;
-  color: white;
 }
 </style>

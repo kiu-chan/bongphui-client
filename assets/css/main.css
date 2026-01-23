@@ -5,25 +5,28 @@
 
 * {
   font-family: "FS Magistral", sans-serif;
+  box-sizing: border-box;
 }
 html,
 body {
   margin: 0;
   padding: 0;
-  height: auto; /* auto tính theo content */
-  min-height: 100%; /* đảm bảo có thể cao thêm */
+  width: 100%;
+  min-height: 100vh;
 }
 body {
-  /* position: relative;
-  background: linear-gradient(180deg, #121d7b 0%, #111167 100%);
-  margin: 0;
-  padding: 0; */
   position: relative;
   background: linear-gradient(180deg, #121d7b 0%, #111167 100%);
   margin: 0;
-  padding: 0;
-  height: 100%;
+  padding:  0;
+  width: 100vw;
+  min-height: 100vh;
 }
+#__nuxt {
+  width: 100%;
+  min-height: 100vh;
+}
+
 .icon {
   width: 20px;
   height: 20px;
@@ -184,4 +187,75 @@ select:focus {
   width: 15px;
   height: 15px;
   background-color: rgba(255, 229, 190, 1);
+}
+.container {
+  width: 100%; /* Đảm bảo nó chiếm toàn bộ chiều rộng có sẵn */
+  margin: 0 auto; /* Căn giữa */
+  padding-left: 1rem; /* Padding cho mobile */
+  padding-right: 1rem; /* Padding cho mobile */
+}
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Media Query cho màn hình MD (>= 768px) */
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+/* Media Query cho màn hình LG (>= 1024px) */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Media Query cho màn hình XL (>= 1280px) */
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+/* Media Query cho màn hình 2XL (>= 1536px) */
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1440px; /* Ví dụ: giới hạn ở 1440px */
+  }
+}
+
+/* Mobile Responsive Fixes */
+@media screen and (max-width: 768px) {
+  html, body {
+    width: 100vw;
+    overflow-x: hidden;
+  }
+  
+  * {
+    max-width: 100%;
+  }
+  
+  .container {
+    width: 100%;
+    padding-left: 1rem;
+    padding-right:  1rem;
+  }
+}
+
+@media screen and (max-width:  390px) {
+  html, body {
+    font-size: 14px;
+  }
+  
+  .grid {
+    padding: 0 0.5rem;
+  }
 }

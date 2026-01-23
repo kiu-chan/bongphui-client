@@ -1,12 +1,9 @@
-import { Icon } from "#components";
-
 export const headerLeague = [
   {
     id: 1,
     title: "Trang chủ",
     router: "/",
   },
-
   {
     id: 2,
     title: "Giải đấu",
@@ -21,12 +18,12 @@ export const headerLeague = [
     id: 4,
     title: "Liên hệ",
     iconName: "mdi-light:bell",
-    router: "",
+    router: "/lienhe",
   },
   {
     id: 5,
-    title: "Đăng nhập/Đăng ký",
+    title: "Đăng nhập",
     iconName: "mdi-light:account",
-    router: "",
+    router: "/login",
   },
 ];

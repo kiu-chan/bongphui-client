@@ -3,152 +3,106 @@
     :open="openPopup"
     :width="700"
     :title="'Xem chi tiết kết quả trận đấu'"
-    @toggle="$emit('toggle')"
-   
+    @toggle="handleTongle()"
   >
     <div class="flex justify-center flex-col items-center">
-        <h3 class="text-lg font-extrabold">
-            GIẢI BÓNG ĐÁ SINH VIÊN VĂN PHÒNG LẦN III NĂM 2025
-        </h3>
-        <h2 class="text-xl font-black mt-[30px]">
-            KẾT QUẢ TRẬN ĐẤU
-        </h2>
-        <p class="text-base font-medium mt-[10px]">12:00 07-06-2025</p>
+      <h3 class="text-lg font-extrabold">
+        GIẢI BÓNG ĐÁ SINH VIÊN VĂN PHÒNG LẦN III NĂM 2025
+      </h3>
+      <h2 class="text-xl font-black mt-[30px]">KẾT QUẢ TRẬN ĐẤU</h2>
+      <p class="text-base font-medium mt-[10px]">12:00 07-06-2025</p>
     </div>
     <div class="px-18 flex justify-center items-center mt-[20px]">
-      <div class="grid grid-cols-3 gap-4">
+      <div class="grid grid-cols-3 gap-[70px]">
         <div class="flex justify-center flex-col items-center gap-4">
-            <img 
-            class="w-[200px] h-[200px] object-contain "
+          <img
+            class="w-[200px] h-[200px] object-contain"
             loading="lazy"
-            src="../../../assets/img/Chelsea_FC.svg.png" alt="">
-            <h2 class="text-lg font-extrabold">
-                FC ĐOÀN KẾT
-            </h2>
+            :src="
+              logoHome != null
+                ? logoHome
+                : '../../../assets/img/Chelsea_FC.svg.png'
+            "
+            alt=""
+          />
+          <h2 class="text-lg font-extrabold">FC {{ homeName }}</h2>
         </div>
         <div class="flex justify-center items-center text-8xl font-semibold">
-            {{ homeScore }}-{{ awayScore }}
+          <p>{{ homeScore }}</p>
+          <p>-</p>
+          <p>{{ awayScore }}</p>
         </div>
         <div class="flex justify-center flex-col items-center gap-4">
-            <img 
-             class="w-[200px] h-[200px] object-contain "
+          <img
+            class="w-[200px] h-[200px] object-contain"
             loading="lazy"
-            src="../../../assets/img/Chelsea_FC.svg.png" alt="">
-            <h2 class="text-lg font-extrabold">
-                FC THUỶ CHUYÊN SỈ
-            </h2>
+            :src="
+              logoAway != null
+                ? logoAway
+                : '../../../assets/img/Chelsea_FC.svg.png'
+            "
+            alt=""
+          />
+          <h2 class="text-lg font-extrabold">FC {{ awayName }}</h2>
         </div>
       </div>
     </div>
-    <div class="p-5 grid grid-cols-2 gap-8">
-      <div class="col-span-2 flex justify-center">DANH SÁCH THI ĐẤU</div>
-      <div class="col-span-2 flex justify-around">
-        <h2>Đội : {{ homeName }}</h2>
-        <h2>Đội : {{ awayName }}</h2>
+    <div class="p-5 grid grid-cols-2 gap-12">
+      <div class="col-span-1">
+        <div v-for="(item, index) in player1" :key="index">
+          <div class="flex justify-end gap-3">
+            <div clas="mt-[20px]">
+              <div v-if="item.title === 'Yellow'">🟨</div>
+              <div v-else-if="item.title === 'Red'">🟥</div>
+              <div v-else-if="item.title === 'Goal'">⚽</div>
+              <div>{{ item.playerName }}</div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="col-span-1">
-        <table class="min-w-full rounded-xl shadow">
-          <thead class="">
-            <tr>
-              <th class="px-4 py-2 text-center w-[100px]">Số áo</th>
-              <th class="px-4 py-2">Họ và tên</th>
-              <th class="px-4 py-2 text-center text-center w-[200px]">
-                Đá chính/Dự bị
-              </th>
-              <th class="px-4 py-2 text-center w-[60px]">bàn thắng</th>
-              <th class="px-4 py-2 w-[60px]">Thẻ vàng</th>
-              <th class="px-4 py-2 text-center w-[60px]">Thẻ đỏ</th>
-            </tr>
-          </thead>
-          <tbody>
-          <tr v-for="(item, index) in player1" :key="index">
-              <td class="px-4 py-2">
-                {{item.numberOfPlayer !=null ? item.numberOfPlayer : 0  }}
-                
-              </td>
-              <td class="px-4 py-2">
-                {{ item.name }}
-              </td>
-              <td class="px-4 py-2">
-                <!-- {{ item.reservePlayer }} -->Đá chính
-              </td>
-              <td class="px-4 py-2">
-                {{ item.goals }}
-              </td>
-              <td class="px-4 py-2">
-                {{ item.yellowCards }}
-              </td>
-              <td class="px-4 py-2">
-                {{ item.redCards }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="col-span-1">
-        <table class="min-w-full rounded-xl shadow">
-          <thead class="">
-            <tr>
-              <th class="px-4 py-2 text-center w-[100px]">Số áo</th>
-              <th class="px-4 py-2">Họ và tên</th>
-              <th class="px-4 py-2 text-center text-center w-[200px]">
-                Đá chính/Dự bị
-              </th>
-              <th class="px-4 py-2 text-center w-[60px]">bàn thắng</th>
-              <th class="px-4 py-2 w-[60px]">Thẻ vàng</th>
-              <th class="px-4 py-2 text-center w-[60px]">Thẻ đỏ</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in player2" :key="index">
-              <td class="px-4 py-2">
-                {{item.numberOfPlayer !=null ? item.numberOfPlayer : 0  }}
-                
-              </td>
-              <td class="px-4 py-2">
-                {{ item.name }}
-              </td>
-              <td class="px-4 py-2">
-                <!-- {{ item.reservePlayer }} --> Dự bị
-              </td>
-              <td class="px-4 py-2">
-                {{ item.goals }}
-              </td>
-              <td class="px-4 py-2">
-                {{ item.yellowCards }}
-              </td>
-              <td class="px-4 py-2">
-                {{ item.redCards }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="flex justify-start">
+          <div class="col-span-1">
+            <div v-for="(item, index) in player2" :key="index">
+              <div class="flex justify-end gap-4">
+                <div class="mt-[20px]">
+                  <div v-if="item.title === 'Yellow'">
+                    🟨 {{ item.playerName }}
+                  </div>
+                  <div v-else-if="item.title === 'Red'">
+                    🟥 {{ item.playerName }}
+                  </div>
+                  <div v-else-if="item.title === 'Goal'">
+                    ⚽ {{ item.playerName }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    
   </popUpFull>
 </template>
 
 <script lang="ts">
 import popUpFull from "../../library/popupFull/index.vue";
-import inputNebula from "../../library/input/index.vue";
-import dateTimePicker from "../../library/dateTimePicker/index.vue";
 
-import { usePlayerStore } from "../../../store/player";
+// import { usePlayerStore } from "../../../store/player";
 import { useMatchStore } from "../../../store/matchManger";
 
 interface Player {
-  numberOfPlayer: number;
-  name: string;
-  goals: number;
-  yellowCards: number;
-  redCards: number;
+  highlightId: number;
+  matchId: number;
+  minute_given: string;
+  playerId: number;
+  playerName: string;
+  teamName: string;
+  title: string;
 }
 export default defineComponent({
   components: {
     popUpFull,
-    inputNebula,
-    dateTimePicker,
   },
   props: {
     openPopup: {
@@ -159,22 +113,23 @@ export default defineComponent({
       type: Number,
       required: true,
     },
-   
   },
   emits: ["toggle", "success"],
   setup(props, ctx) {
     const { openPopup, id } = toRefs(props);
-    const PlayerStore = usePlayerStore();
+    const MatchStore = useMatchStore();
     const openPlayer: Ref<boolean> = ref(false);
     const homeScore: Ref<number | undefined> = ref();
     const awayScore: Ref<number | undefined> = ref();
+    const logoHome: Ref<string> = ref("");
+    const logoAway: Ref<string> = ref("");
     const matchDateTime: Ref<string> = ref("");
     const refereeName: Ref<string> = ref("");
     const player1: Ref<Array<Player>> = ref([]);
     const player2: Ref<Array<Player>> = ref([]);
     const dataPlayer: Ref<Array<any>> = ref([]);
-    const awayName:Ref<string> = ref("");
-    const homeName:Ref<string> = ref("");
+    const awayName: Ref<string> = ref("");
+    const homeName: Ref<string> = ref("");
     const toast = useToast();
 
     watch(openPopup, (_new) => {
@@ -182,24 +137,42 @@ export default defineComponent({
         fnGetPlayer();
       }
     });
+    const handleTongle = () => {
+      player1.value = [];
+      player2.value = [];
+      ctx.emit("toggle");
+    };
     const fnGetPlayer = () => {
-      PlayerStore.fnGetPlayerMatch(22)
+      MatchStore.fnMatchDetail(id.value)
         .then((res: any) => {
-          player1.value = res.playerTeam1;
-          player2.value = res.playerTeam2;
+          console.log(res, "Tiên Chính");
+          // player1.value = res.playerTeam1;
+          // player2.value = res.playerTeam2;
           awayScore.value = res.awayScore;
           homeScore.value = res.homeScore;
           matchDateTime.value = res.matchDateTime;
           refereeName.value = res.refereeName;
-          homeName.value =res.teamHomeName;
-          awayName.value =res.teamAwayName;
-
+          homeName.value = res.homeTeam.name;
+          awayName.value = res.awayTeam.name;
+          logoHome.value = res.homeTeam.logoUrl;
+          logoAway.value = res.awayTeam.logoUrl;
+          res.highlights.forEach((h) => {
+            if (h.teamName === homeName.value) {
+              player1.value.push(h);
+            } else if (h.teamName === awayName.value) {
+              player2.value.push(h);
+            }
+          });
+          console.log(player1.value, "tien chinh");
+          console.log(player2.value, "tien chinh2");
         })
         .catch((err) => {
           console.log(err);
         });
     };
     return {
+      logoHome,
+      logoAway,
       openPlayer,
       homeScore,
       awayScore,
@@ -211,6 +184,7 @@ export default defineComponent({
       player1,
       player2,
       location,
+      handleTongle,
     };
   },
 });

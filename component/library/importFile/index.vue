@@ -133,7 +133,6 @@ export default defineComponent({
     const handleFileChange = (event: Event) => {
       const target = event.target as HTMLInputElement;
       const file = target.files?.[0];
-      console.log(file, "file");
       if (file) {
         selectedFile.value = file;
       }
@@ -158,7 +157,6 @@ export default defineComponent({
         const url = params.length > 0 ? `?${params.join("&")}` : "";
         ImportStore.fnAddImportTeam(url, payload)
           .then((res: any) => {
-            console.log(res, "chính");
             ctx.emit("success");
           })
           .catch((err) => {

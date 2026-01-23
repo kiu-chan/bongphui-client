@@ -1,5 +1,5 @@
 <template>
-  <div class="col-span-3">
+  <div class="">
     <label
       style="color: rgba(0, 0, 0, 1)"
       class="block text-[25px] font-medium"
@@ -11,6 +11,7 @@
       class="inputBackground w-full mt-4"
       v-model="inputValue"
     />
+    <p v-if="error" class="text-red-500 text-sm mt-1">{{ error }}</p>
   </div>
 </template>
 <script lang="ts">
@@ -28,6 +29,10 @@ export default defineComponent({
       type: [String, Number],
       required: false,
       default: "",
+    },
+    error: {
+      type: String,
+      required: false,
     },
   },
   emits: ["update:modelValue"],

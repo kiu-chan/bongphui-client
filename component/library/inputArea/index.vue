@@ -1,55 +1,91 @@
 <template>
-  <div class="col-span-3">
-    <label
-      style="color: rgba(0, 0, 0, 1)"
-      class="block text-[25px] font-medium"
-      >{{ name }}</label
-    >
+  <div class="input-area">
+    <label v-if="name" class="label">{{ name }}</label>
+
     <textarea
-      type="text"
-      name="text"
-      autocomplete="off"
-      rows="4"
-      placeholder="Nhập mô tả"
-      v-model="inputValue"
-      cols="50"
-      class="inputBackground w-full pt-2 mt-4"
-    >
-    </textarea>
+      :placeholder="placeholder"
+      class="textarea"
+      :value="modelValue"
+      @input="onInput"
+      :rows="rows"
+    ></textarea>
+
+    <!-- Hiển thị lỗi duy nhất từ prop error -->
+    <div v-if="error" class="error-text">{{ error }}</div>
   </div>
 </template>
+
 <script lang="ts">
+import { defineComponent } from "vue";
+
 export default defineComponent({
+  name: "InputArea",
   props: {
-    name: {
-      type: String,
-      required: true,
-    },
     modelValue: {
       type: String,
-      required: false,
       default: "",
     },
+    name: {
+      type: String,
+      default: "",
+    },
+    placeholder: {
+      type: String,
+      default: "",
+    },
+    error: {
+      type: String,
+      default: "",
+    },
+    rows: {
+      type: Number,
+      default: 4,
+    },
   },
-  emits: ["update:modelValue"],
+  emits: ["update:modelValue", "input"],
   setup(props, { emit }) {
-    const inputValue = computed({
-      get: () => props.modelValue,
-      set: (value: string) => emit("update:modelValue", value),
-    });
-    return {
-      inputValue,
-    };
+    function onInput(e: Event) {
+      const val = (e.target as HTMLTextAreaElement).value;
+      emit("update:modelValue", val);
+      emit("input", val);
+    }
+
+    return { onInput };
   },
 });
 </script>
 
 <style scoped>
-.inputBackground {
-  background-color: rgba(250, 249, 249, 1);
-  align-items: center;
-  border-radius: 15px;
-  padding-left: 20px;
+.input-area {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.textarea {
+  background: #faf9f9;
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid transparent;
+  min-height: 100px;
+  resize: vertical;
+  font-size: 14px;
+  color: #111;
   outline: none;
+  box-sizing: border-box;
+}
+
+.textarea:focus {
+  border-color: rgba(0,0,0,0.08);
+}
+
+.error-text {
+  color: #eb0428;
+  font-size: 13px;
+  margin-top: 6px;
 }
 </style>

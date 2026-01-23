@@ -4,33 +4,40 @@
       v-if="open"
       class="bgPopup fixed inset-0 flex justify-center items-center z-999"
     >
-      <div
-        class="bg-fc-dark rounded-xl w-full h-full shadow-2xl overflow-hidden text-white relative"
-      >
+      <div class="w-full h-full shadow-2xl overflow-hidden text-black relative">
         <div class="PopUp absolute inset-0 fc-radial-bg z-0"></div>
-        <div class="PopUp-text relative z-10 h-full">
+        <div class="relative z-10 h-full">
           <!-- Header -->
           <div
-            class="px-5 py-4 border-b border-white border-opacity-10 flex items-center h-[10%]"
+            style="background: linear-gradient(90deg, #e97552 0%, #a949cf 100%)"
+            class="titlePopUp px-5 py-4 border-white flex items-center h-[10%]"
           >
-            <h2 class="text-xl font-bold">{{ title }}</h2>
+            <h2 class="text-xl font-bold text-white">{{ title }}</h2>
           </div>
           <div class="h-[80%] overflow-auto px-5 py-4">
             <slot />
           </div>
           <!-- Footer -->
           <div
-            class="bg-opacity-20 px-5 py-3 border-t border-white border-opacity-10 flex justify-end gap-4 h-[10%]"
+            class="px-5 py-3 border-t-4 border-gray-300 flex justify-end gap-4 h-[10%]"
           >
             <button
               @click="$emit('success')"
-              class="ButtonColor px-5 py-2 rounded-lg transition-colors"
+              style="
+                background: linear-gradient(90deg, #e97552 0%, #a949cf 100%);
+                color: rgba(255, 255, 255, 1);
+              "
+              class="ButtonColor px-5 py-2 rounded-lg"
             >
               Tạo
             </button>
             <button
               @click="$emit('toggle')"
-              class="ButtonColor px-5 py-2 rounded-lg transition-colors"
+              style="
+                border: 1px solid rgba(4, 184, 10, 1);
+                color: rgba(4, 184, 10, 1);
+              "
+              class="ButtonColor px-5 py-2 rounded-lg"
             >
               Đóng
             </button>
@@ -67,7 +74,7 @@ export default defineComponent({
 
 <style scoped>
 .PopUp {
-  background-color: hsl(210 9.09% 4.31%);
+  background-color: rgba(255, 255, 255, 1);
   box-shadow: 5px 10px;
 }
 .bg-fc-dark {
@@ -80,9 +87,9 @@ export default defineComponent({
     transparent 94%
   );
 }
-.bgPopup {
+/* .bgPopup {
   background-color: rgba(0, 0, 0, 0.7);
-}
+} */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s ease;

@@ -40,7 +40,7 @@
           <div class="flex justify-between">
             <div
               :style="
-                item.id == 1
+                route.path.includes(item.router)
                   ? {
                       background:
                         'linear-gradient(90deg, #E87451 0%, #AF4CC4 100%)',
@@ -54,7 +54,7 @@
               <NuxtLink :to="item.router">
                 <p
                   :style="
-                    item.id == 1
+                    route.path.includes(item.router)
                       ? { color: 'rgba(255, 255, 255, 1)' }
                       : { color: 'rgba(0, 0, 0, 1)' }
                   "
@@ -78,8 +78,9 @@ import championLeague from "../../assets/img/championLeague (2).png";
 import { headerLeague } from "../../utils/headerLeague";
 
 const { stt } = defineProps<{ stt: number }>();
+const route = useRoute();
 onMounted(() => {
-  console.log(stt, "chính");
+  console.log(route.path, "chính");
 });
 // const route = useRoute();
 </script>

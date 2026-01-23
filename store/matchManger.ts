@@ -3,11 +3,11 @@ import { defineStore } from "pinia";
 export const useMatchStore = defineStore("Match", {
   state: () => ({
     match_score: {
-      url: "/matches/:id/scores",
+      url: "/matches/scores/:id",
       methods: "PUT",
     },
     match_status: {
-      url: "/matches/:id/status",
+      url: "/matches/status/:id",
       methods: "PUT",
     },
     match_player: {
@@ -15,7 +15,7 @@ export const useMatchStore = defineStore("Match", {
       methods: "GET",
     },
     player_Manager: {
-      url: "/matches/:id/players",
+      url: "/matches/players/:id",
       methods: "GET",
     },
     match_UpdatePlayer: {
@@ -23,7 +23,7 @@ export const useMatchStore = defineStore("Match", {
       methods: "PUT",
     },
     match_update: {
-      url: "/matches/:id/update",
+      url: "/matches/update/:id",
       methods: "PUT",
     },
     match_new: {
@@ -31,11 +31,15 @@ export const useMatchStore = defineStore("Match", {
       methods: "GET",
     },
     matches_newTeam: {
-      url: "/matches/team/:teamId/newest",
+      url: "/matches/team/newest/:teamId",
       methods: "GET",
     },
     matches_Schedule: {
-      url: "/matches/:id/schedule",
+      url: "/matches/schedule/:id",
+      method: "GET",
+    },
+    matches_detail: {
+      url: "/matches/:id",
       method: "GET",
     },
   }),
@@ -47,9 +51,20 @@ export const useMatchStore = defineStore("Match", {
         payload
       );
     },
+    async fnMatchDetail(id: number) {
+      const { $api } = useNuxtApp();
+      return await $api.get(
+        this.matches_detail.url.replaceAll(":id", String(id))
+      );
+    },
     async fnUpdateMatches(id: any, payload: any) {
       const { $api } = useNuxtApp();
       const url = this.match_UpdatePlayer.url.replace(":matchId", String(id));
+      return await $api.put(url, payload);
+    },
+    async fnUpdateMatchesTeam(id: any, payload: any) {
+      const { $api } = useNuxtApp();
+      const url = this.match_update.url.replace(":id", String(id));
       return await $api.put(url, payload);
     },
     async fnUpdateMatchStatus(id: number, url: string) {

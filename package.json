@@ -7,7 +7,8 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "tailwind:init": "tailwindcss init"
   },
   "dependencies": {
     "@nuxt/content": "^3.5.1",
@@ -20,6 +21,7 @@
     "@types/aos": "^3.0.7",
     "aos": "^2.3.4",
     "eslint": "^9.27.0",
+    "html2canvas": "^1.4.1",
     "nuxt": "^3.17.4",
     "nuxt-toast": "^1.1.4",
     "pinia": "^3.0.3",
@@ -29,6 +31,9 @@
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
-    "@nuxtjs/tailwindcss": "^7.0.0-beta.0"
+    "@nuxtjs/tailwindcss": "^7.0.0-beta.0",
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.17"
   }
 }

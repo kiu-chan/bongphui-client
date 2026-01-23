@@ -8,16 +8,19 @@
   >
     <div class="p-5 max-h-[60vh] grid grid-cols-2 gap-8">
       <inputNebula
+        class="col-span-2"
         :placeholder="'Nhập số lượng bảng đấu'"
         :name="'Số lượng bảng đấu'"
         v-model="numberOfTables"
       />
       <inputNebula
-        :placeholder="'Nhập số lượng đội trong bảng đấu'"
+        class="col-span-2"
+        :placeholder="'Nhập số lượng đội bóng trong bảng'"
         :name="'Số lượng đội bóng trong bảng'"
         v-model="teamsPerTable"
       />
       <inputNebula
+        class="col-span-2"
         :placeholder="'Số vòng bảng trong giải đấu'"
         :name="'Số lượng vòng bảng trong giải đấu'"
         v-model="numberOfPhases"
@@ -89,7 +92,6 @@ export default defineComponent({
         teamsPerTable: Number(teamsPerTable.value),
         leagueRequests: chiabang(),
       };
-      console.log(payload);
       TournamentStore.fnCreatedLeague(id.value, payload)
         .then((res: any) => {
           toast.success({
@@ -97,7 +99,7 @@ export default defineComponent({
             position: "topRight",
           });
           fnAddLeagueMatches();
-          navigateTo(`/giaidau/${id.value}/bangxephang`);
+          navigateTo(`/quanlygiaidau/${id.value}/bangxephang`);
         })
         .catch((err) => {
           toast.error({

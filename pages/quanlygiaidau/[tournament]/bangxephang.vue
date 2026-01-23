@@ -53,12 +53,12 @@
                 STT
               </th>
               <th class="px-4 py-2 text-white">Tên đội</th>
-              <th class="px-4 py-2 text-white">Trận</th>
-              <th class="px-4 py-2 text-white">Thắng</th>
-              <th class="px-4 py-2 text-white">Hòa</th>
-              <th class="px-4 py-2 text-white">Thua</th>
-              <th class="px-4 py-2 text-white">Hiệu số</th>
-              <th class="px-4 py-2 text-white">Điểm</th>
+              <th class="px-4 py-2 text-white text-center">Trận</th>
+              <th class="px-4 py-2 text-white text-center">Thắng</th>
+              <th class="px-4 py-2 text-white text-center">Hòa</th>
+              <th class="px-4 py-2 text-white text-center">Thua</th>
+              <th class="px-4 py-2 text-white text-center">Hiệu số</th>
+              <th class="px-4 py-2 text-white text-center">Điểm</th>
             </tr>
           </thead>
           <tbody>
@@ -77,14 +77,14 @@
               >
                 {{ item2.teamName }}
               </td>
-              <td class="px-4 py-4">{{ item2.matchesPlayed }}</td>
-              <td class="px-4 py-4">{{ item2.wins }}</td>
-              <td class="px-4 py-4">{{ item.draws }}</td>
-              <td class="px-4 py-4 font-bold">
+              <td class="px-4 py-4 text-center">{{ item2.matchesPlayed }}</td>
+              <td class="px-4 py-4 text-center">{{ item2.wins }}</td>
+              <td class="px-4 py-4 text-center">{{ item.draws }}</td>
+              <td class="px-4 py-4 font-bold text-center">
                 {{ item2.losses }}
               </td>
-              <td class="px-4 py-4 font-bold">10</td>
-              <td class="px-4 py-4">{{ item2.points }}</td>
+              <td class="px-4 py-4 font-bold text-center">0</td>
+              <td class="px-4 py-4 text-center">{{ item2.points }}</td>
             </tr>
           </tbody>
         </table>

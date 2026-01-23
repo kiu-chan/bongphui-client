@@ -6,10 +6,7 @@ export const useTournamentStore = defineStore("taogiaidau", {
       url: "/tournaments",
       methods: "GET",
     },
-    tournament_ongoing: {
-      url: "/tournaments/ongoing",
-      methods: "GET",
-    },
+
     search_tournament: {
       url: "/tournaments/search",
       methods: "GET",
@@ -62,9 +59,35 @@ export const useTournamentStore = defineStore("taogiaidau", {
       url: "/tournaments/:id/generate-matches",
       methods: "POST",
     },
-    listTournamentFeatured: {
+    listOnGoing: {
+      url: "/tournaments/ongoing",
+      methods: "GET",
+    },
+    listFeartured: {
       url: "/tournaments/featured",
-      get: "GET",
+      methods: "GET",
+    },
+    listUpcoming: {
+      url: "/tournaments/upcoming",
+      methods: "GET",
+    },
+    listCompleted: {
+      url: "/tournaments/completed",
+      methods: "GET",
+    },
+
+    // fees endpoints
+    fees_tournament: {
+      url: "/fees/tournament/:tournamentId",
+      methods: "GET",
+    },
+    fees_balance: {
+      url: "/fees/tournament/:tournamentId/balance",
+      methods: "GET",
+    },
+    create_fee: {
+      url: "/fees",
+      methods: "POST",
     },
   }),
   actions: {
@@ -72,14 +95,43 @@ export const useTournamentStore = defineStore("taogiaidau", {
       const { $api } = useNuxtApp();
       return await $api.get(`${this.list_tournament.url}${url}`);
     },
-    async fnGetListFeature() {
+    async fnGetOngoing(url: string) {
       const { $api } = useNuxtApp();
-      return await $api.get(`${this.listTournamentFeatured.url}`);
+      return await $api.get(`${this.listOnGoing.url}${url}`);
     },
-    async fnGetTournamentOngoing(url: string) {
+    async fnGetFeartured(url: string) {
       const { $api } = useNuxtApp();
-      return await $api.get(`${this.tournament_ongoing.url}${url}`);
+      return await $api.get(`${this.listFeartured.url}${url}`);
     },
+    async fnGetUpcoming(url: string) {
+      const { $api } = useNuxtApp();
+      return await $api.get(`${this.listUpcoming.url}${url}`);
+    },
+    async fnGetCompleted(url: string) {
+      const { $api } = useNuxtApp();
+      return await $api.get(`${this.listCompleted.url}${url}`);
+    },
+
+    // fees: list for tournament (GET /api/fees/tournament/{id})
+    async fnGetFeesTournament(tournamentId: string | number) {
+      const { $api } = useNuxtApp();
+      const url = this.fees_tournament.url.replaceAll(":tournamentId", String(tournamentId));
+      return await $api.get(url);
+    },
+
+    // balance: GET /api/fees/tournament/{id}/balance
+    async fnGetFeesBalance(tournamentId: string | number) {
+      const { $api } = useNuxtApp();
+      const url = this.fees_balance.url.replaceAll(":tournamentId", String(tournamentId));
+      return await $api.get(url);
+    },
+
+    // create fee: POST /api/fees
+    async fnCreateFee(payload: any) {
+      const { $api } = useNuxtApp();
+      return await $api.post(this.create_fee.url, payload);
+    },
+
     async fnGetTeamsTournament(id: any) {
       const { $api } = useNuxtApp();
       return await $api.get(

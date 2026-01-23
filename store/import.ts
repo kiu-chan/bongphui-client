@@ -22,6 +22,10 @@ export const useImportStore = defineStore("Import", {
       url: "/import/statistics/tournament/:tournamentId/card",
       methods: "GET",
     },
+    import_TournamentFile: {
+      url: "/import/upload-excel",
+      methods: "POST",
+    },
   }),
   actions: {
     async fnAddImportLogoTeam(str: string, payload: any) {
@@ -31,6 +35,13 @@ export const useImportStore = defineStore("Import", {
     async fnAddImportTeam(str: string, payload: any) {
       const { $api } = useNuxtApp();
       return await $api.post(`${this.import_Team.url}${str}`, payload);
+    },
+    async fnAddImportFile(str: string, payload: any) {
+      const { $api } = useNuxtApp();
+      return await $api.post(
+        `${this.import_TournamentFile.url}${str}`,
+        payload
+      );
     },
     async fnGetImportTournament(id: string) {
       const { $api } = useNuxtApp();
