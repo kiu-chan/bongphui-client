@@ -24,23 +24,6 @@ export const useAuthStore = defineStore("auth", {
       } catch (e) {
         console.warn("setToken storage error", e);
       }
-
-      try {
-        const nuxtApp: any = useNuxtApp();
-        const api = nuxtApp?.$api;
-        if (api) {
-          if (api.defaults && api.defaults.headers) {
-            api.defaults.headers.common = api.defaults.headers.common || {};
-            if (token) api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-            else delete api.defaults.headers.common["Authorization"];
-          } else if (typeof api.setHeader === "function") {
-            if (token) api.setHeader("Authorization", `Bearer ${token}`);
-            else api.setHeader("Authorization", "");
-          }
-        }
-      } catch (err) {
-        // ignore
-      }
     },
 
     async login(username: string, password: string, remember: boolean = true) {
@@ -71,13 +54,11 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
-    // NEW: register action
     async register(username: string, password: string, role: string = "user") {
       const { $api } = useNuxtApp();
       try {
         const payload = { username, password, role };
         const res: any = await $api.post("/auth/register", payload);
-        // normalize response: prefer res.data else res
         const data = res?.data ?? res;
         return data;
       } catch (err: any) {
@@ -91,6 +72,15 @@ export const useAuthStore = defineStore("auth", {
     logout() {
       this.setToken(null, true);
       this.user = null;
+    },
+
+    initAuth() {
+      if (process.client) {
+        const token = localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token");
+        if (token) {
+          this.setToken(token, !!localStorage.getItem("auth_token"));
+        }
+      }
     },
   },
 });

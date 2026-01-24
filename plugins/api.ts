@@ -8,10 +8,17 @@ export default defineNuxtPlugin(() => {
 
   const baseFetch = ofetch.create({
     baseURL: config.public.apiBase as string,
-    credentials: "include", // Gửi cookie/session đến backend
-    // headers: {
-    // 'Content-Type': 'application/json', // Đảm bảo định dạng gửi là JSON
-    // },
+    credentials: "include",
+    async onRequest({ options }) {
+      // Tự động thêm token vào mọi request
+      if (process.client) {
+        const token = localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token");
+        if (token) {
+          options.headers = new Headers(options.headers as HeadersInit);
+          options.headers.set("Authorization", `Bearer ${token}`);
+        }
+      }
+    },
   });
 
   const api: ApiInstance = {

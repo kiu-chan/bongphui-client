@@ -242,7 +242,7 @@ export default defineComponent({
       tournament.value = null;
       teams.value = [];
       try {
-        const apiUrl = `http://localhost:8080/api/export/tournaments?tournamentId=${encodeURIComponent(tournamentId)}`;
+        const apiUrl = `http://103.147.35.53:3005/api/export/tournaments?tournamentId=${encodeURIComponent(tournamentId)}`;
         const resp = await fetch(apiUrl);
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const data = await resp.json();

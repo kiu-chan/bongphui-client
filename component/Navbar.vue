@@ -1,14 +1,18 @@
 <script lang="ts">
-import { ref, type Ref } from "vue";
+import { ref, computed, type Ref } from "vue";
 import { headerLeague } from "../utils/header";
 import SideBar from "./SideBar.vue";
 import defaultBanner from "../assets/img/2023.2.24-Crop-Football-Kid-An-2-copy-2 1.png";
 import defaultBanner2 from "../assets/img/vietnam.png";
+import { useAuthStore } from "~/store/auth";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   components: { SideBar },
   setup() {
     const Route = useRoute();
+    const router = useRouter();
+    const authStore = useAuthStore();
     const openSideBar: Ref<boolean> = ref(false);
     const banner: Ref<string> = ref(defaultBanner);
     const item: { id: number; img: string }[] = [
@@ -18,11 +22,16 @@ export default defineComponent({
       { id: 4, img: defaultBanner2 },
     ];
 
+    const isLoggedIn = computed(() => authStore.isAuthenticated);
+
+    const handleLogout = () => {
+      authStore.logout();
+      router.push('/');
+    };
+
     const handelRouter = (item) => {
       console.log(item, "item");
     };
-
-    // --- Kết thúc Logic Sửa Lỗi ---
 
     const handleClick = () => {
       openSideBar.value = true;
@@ -42,6 +51,8 @@ export default defineComponent({
       handelRouter,
       banner,
       handelBaner,
+      isLoggedIn,
+      handleLogout,
     };
   },
 });
@@ -68,19 +79,54 @@ export default defineComponent({
           :key="item.title"
           class="text-header text-base font-medium"
         >
-          <NuxtLink :to="item.router">
+          <!-- Hiển thị nút Đăng nhập nếu chưa đăng nhập -->
+          <NuxtLink v-if="item.id === 5 && !isLoggedIn" :to="item.router">
             <div
               class="flex h-[40px] items-center gap-[10px] pt-2 pr-4 pb-2 pl-2"
               :class="{ 'gap-[20px]': item.id === 4 }"
             >
               <Icon
-                v-if="item.id === 5"
                 :name="item.iconName || ''"
                 style="width: 42px; height: 42px; color: rgba(255, 255, 255, 1)"
                 width="12"
                 height="12"
               />
+              <h2
+                :style="{
+                  color:
+                    Route.path == item.router ? 'rgba(247, 163, 39, 1)' : '',
+                }"
+                @click="handelRouter(item)"
+                class="text-title font-medium text-[20px]"
+              >
+                {{ item.title }}
+              </h2>
+            </div>
+          </NuxtLink>
 
+          <!-- Hiển thị nút Đăng xuất nếu đã đăng nhập -->
+          <button v-else-if="item.id === 5 && isLoggedIn" @click="handleLogout">
+            <div
+              class="flex h-[40px] items-center gap-[10px] pt-2 pr-4 pb-2 pl-2"
+            >
+              <Icon
+                name="mdi-light:logout"
+                style="width: 42px; height: 42px; color: rgba(255, 255, 255, 1)"
+                width="12"
+                height="12"
+              />
+              <h2 class="text-title font-medium text-[20px]">
+                Đăng xuất
+              </h2>
+            </div>
+          </button>
+
+          <!-- Các menu item khác -->
+          <NuxtLink v-else-if="item.id !== 5" :to="item.router">
+            <div
+              class="flex h-[40px] items-center gap-[10px] pt-2 pr-4 pb-2 pl-2"
+              :class="{ 'gap-[20px]': item.id === 4 }"
+            >
               <h2
                 :style="{
                   color:
@@ -141,9 +187,6 @@ export default defineComponent({
     opacity: 1;
   }
 }
-/* .headerNavbar {
-  background: linear-gradient(180deg, #121d7b 0%, #111167 100%);
-} */
 .text-title {
   color: rgba(255, 255, 255, 1);
 }
