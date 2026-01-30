@@ -55,7 +55,12 @@
             />
           </div>
           <div class="max-w-[88px] max-h-[118px]">
-            <img class="w-full h-full" :src="item.logoUrl" alt="" />
+            <img 
+              class="w-full h-full" 
+              :src="item.logoUrl || '/img/imglg.png'" 
+              alt="" 
+              @error="$event.target.src = '/img/imglg.png'"
+            />
           </div>
           <div
             :style="[
@@ -161,7 +166,7 @@
       :title="'Xóa đội bóng ra khỏi giải đấu'"
       :alertmsgname="teamInfo.name"
       :alertmsg="'Bạn có chắc chắn muốn xóa đội bóng'"
-      @toggle="openAlert = false"
+      @toggle="openAlert.value = false"
       @success="fnGetDelTeamTournament()"
     />
     <Chiabang

@@ -45,8 +45,9 @@
                     <div class="max-w-[110px] h-[130px]">
                       <img
                         class="w-full h-full object-contain"
-                        :src="item?.imageUrl"
+                        :src="item?.imageUrl || '/img/imglg.png'"
                         alt=""
+                        @error="$event.target.src = '/img/imglg.png'"
                       />
                     </div>
                     <div
@@ -109,8 +110,9 @@
                     <div class="max-w-[110px] h-[130px]">
                       <img
                         class="w-full h-full object-contain"
-                        :src="item?.imageUrl"
+                        :src="item?.imageUrl || '/img/imglg.png'"
                         alt=""
+                        @error="$event.target.src = '/img/imglg.png'"
                       />
                     </div>
                     <div
@@ -169,8 +171,9 @@
                     <div class="max-w-[110px] h-[130px]">
                       <img
                         class="w-full h-full object-contain"
-                        :src="item?.imageUrl"
+                        :src="item?.imageUrl || '/img/imglg.png'"
                         alt=""
+                        @error="$event.target.src = '/img/imglg.png'"
                       />
                     </div>
                     <div

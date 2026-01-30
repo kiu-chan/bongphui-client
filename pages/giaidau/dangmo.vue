@@ -27,7 +27,14 @@
               <div v-for="(item, index) in listData" :key="item?.id ?? index" class="cardGiaidau w-full">
                 <NuxtLink :to="`/quanlygiaidau/${item.id}/danhsachdoibong`">
                   <div class="cardAbsolute flex flex-col justify-between items-center p-[16px]">
-                    <div class="max-w-[110px] h-[130px]"><img class="w-full h-full object-contain" :src="item?.imageUrl" alt="" /></div>
+                    <div class="max-w-[110px] h-[130px]">
+                      <img 
+                        class="w-full h-full object-contain" 
+                        :src="item?.imageUrl || '/img/imglg.png'" 
+                        alt="" 
+                        @error="$event.target.src = '/img/imglg.png'"
+                      />
+                    </div>
                     <div :style="[activeIndex === index ? 'color :rgba(244, 134, 55, 1)' : 'color :rgba(0, 0, 0, 1)']" class="text-center">
                       <h2 style="width: 160px" class="font-medium text-[18px] mx-auto">{{ item.name }}</h2>
                     </div>
