@@ -1,156 +1,162 @@
 <template>
   <TournamentHeader :stt="3">
-    <div class="flex justify-end mt-[28px] mb-[28px] gap-4">
-      <div
-        style="
-          width: 213px;
-          height: 50px;
-          border: 1px solid rgba(4, 184, 10, 1);
-          color: rgba(4, 184, 10, 1);
-          border-radius: 10px;
-        "
-        class="flex justify-center items-center font-medium text-[20px] cursor-pointer"
-        @click="openTeamTournament = true"
-      >
-        Chia bảng đấu
-      </div>
-      <div
-        style="
-          width: 213px;
-          height: 50px;
-          border: 1px solid rgba(4, 184, 10, 1);
-          color: rgba(4, 184, 10, 1);
-          border-radius: 10px;
-        "
-        class="flex justify-center items-center font-medium text-[20px] cursor-pointer"
-        @click="openTeambatchTournament = true"
-      >
-        Thêm nhiều đội bóng
-      </div>
+    <div v-if="isLoading" class="flex justify-center items-center py-20">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
     </div>
-    <div style="margin-top: 50px" class="grid grid-cols-4 gap-8">
-      <div
-        v-for="(item, index) in listTeam"
-        :key="index"
-        class="cardGiaidau"
-        :class="[
-          activeIndex === index ? 'cardGiaidau-click' : 'cardGiaidau-noclick',
-        ]"
-        @click="handelClick(index)"
-      >
+    
+    <div v-else>
+      <div class="flex justify-end mt-[28px] mb-[28px] gap-4">
         <div
+          style="
+            width: 213px;
+            height: 50px;
+            border: 1px solid rgba(4, 184, 10, 1);
+            color: rgba(4, 184, 10, 1);
+            border-radius: 10px;
+          "
+          class="flex justify-center items-center font-medium text-[20px] cursor-pointer"
+          @click="openTeamTournament = true"
+        >
+          Chia bảng đấu
+        </div>
+        <div
+          style="
+            width: 213px;
+            height: 50px;
+            border: 1px solid rgba(4, 184, 10, 1);
+            color: rgba(4, 184, 10, 1);
+            border-radius: 10px;
+          "
+          class="flex justify-center items-center font-medium text-[20px] cursor-pointer"
+          @click="openTeambatchTournament = true"
+        >
+          Thêm nhiều đội bóng
+        </div>
+      </div>
+      <div style="margin-top: 50px" class="grid grid-cols-4 gap-8">
+        <div
+          v-for="(item, index) in listTeam"
+          :key="index"
+          class="cardGiaidau"
           :class="[
-            activeIndex === index
-              ? 'cardAbsolute-click'
-              : 'cardAbsolute-noclick',
+            activeIndex === index ? 'cardGiaidau-click' : 'cardGiaidau-noclick',
           ]"
-          class="cardAbsolute relative flex flex-col justify-between items-center pl-[51px] pr-[51px] pt-[22px] pb-[22px]"
+          @click="handelClick(index)"
         >
-          <div class="absolute top-[20px] left-[14px]">
-            <Icon
-              class="w-[24px] h-[24px]"
-              name="hugeicons:delete-02"
-              style="color: #eb0428"
-              @click="handleDellete(item)"
-            />
-          </div>
-          <div class="max-w-[88px] max-h-[118px]">
-            <img 
-              class="w-full h-full" 
-              :src="item.logoUrl || '/img/imglg.png'" 
-              alt="" 
-              @error="$event.target.src = '/img/imglg.png'"
-            />
-          </div>
           <div
-            :style="[
+            :class="[
               activeIndex === index
-                ? 'color :rgba(244, 134, 55, 1)'
-                : 'color :rgba(0, 0, 0, 1)',
+                ? 'cardAbsolute-click'
+                : 'cardAbsolute-noclick',
             ]"
+            class="cardAbsolute relative flex flex-col justify-between items-center pl-[51px] pr-[51px] pt-[22px] pb-[22px]"
           >
-            <h2 class="font-medium text-[25px] text-center">
-              {{ item.name }}
-            </h2>
-            <h3 class="font-normal text-[18px] text-center">
-              {{ item.home_stadium }}
-            </h3>
-          </div>
-          <div
-            :style="[
-              activeIndex === index
-                ? 'background: linear-gradient(90deg,#ec7748 0%,#a545d6 100%)'
-                : 'background :rgba(177, 174, 172, 1)',
-            ]"
-            style="color: rgba(255, 255, 255, 1)"
-            class="w-[138px] h-[40px] rounded-[5px] flex justify-center items-center font-normal text-[16px]"
-          >
-            Xem chi tiết
+            <div class="absolute top-[20px] left-[14px]">
+              <Icon
+                class="w-[24px] h-[24px]"
+                name="hugeicons:delete-02"
+                style="color: #eb0428"
+                @click="handleDellete(item)"
+              />
+            </div>
+            <div class="max-w-[88px] max-h-[118px]">
+              <img 
+                class="w-full h-full" 
+                :src="item.logoUrl || '/img/imglg.png'" 
+                alt="" 
+                @error="$event.target.src = '/img/imglg.png'"
+              />
+            </div>
+            <div
+              :style="[
+                activeIndex === index
+                  ? 'color :rgba(244, 134, 55, 1)'
+                  : 'color :rgba(0, 0, 0, 1)',
+              ]"
+            >
+              <h2 class="font-medium text-[25px] text-center">
+                {{ item.name }}
+              </h2>
+              <h3 class="font-normal text-[18px] text-center">
+                {{ item.home_stadium }}
+              </h3>
+            </div>
+            <div
+              :style="[
+                activeIndex === index
+                  ? 'background: linear-gradient(90deg,#ec7748 0%,#a545d6 100%)'
+                  : 'background :rgba(177, 174, 172, 1)',
+              ]"
+              style="color: rgba(255, 255, 255, 1)"
+              class="w-[138px] h-[40px] rounded-[5px] flex justify-center items-center font-normal text-[16px]"
+            >
+              Xem chi tiết
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="flex justify-center mt-[40px] mb-[40px]">
-      <div class="flex justify-between gap-4 items-center">
-        <div
-          class="flex items-center justify-center w-[50px] h-[50px] rounded-full"
-          style="
-            border: 1.5px solid rgba(247, 163, 39, 1);
-            color: rgba(247, 163, 39, 1);
-          "
-        >
-          <Icon
-            class="text-[20px]"
-            name="ci:chevron-left"
-            width="40"
-            height="40"
-          />
-        </div>
-        <div class="flex gap-2">
-          <Icon
-            class="dotCirCle"
-            name="octicon:dot-fill-16"
-            width="16"
-            height="16"
-          />
-          <Icon
-            class="dotCirCle"
-            name="octicon:dot-fill-16"
-            width="16"
-            height="16"
-          />
-          <Icon
-            class="dotCirCle"
-            name="octicon:dot-fill-16"
-            width="16"
-            height="16"
-          />
-          <Icon
-            class="dotCirCle"
-            name="octicon:dot-fill-16"
-            width="16"
-            height="16"
-          />
-          <Icon
-            class="dotCirCle"
-            name="octicon:dot-fill-16"
-            width="16"
-            height="16"
-          />
-        </div>
-        <div
-          class="flex items-center justify-center w-[50px] h-[50px] rounded-full"
-          style="
-            background-color: rgba(247, 163, 39, 1);
-            color: rgba(255, 255, 255, 1);
-          "
-        >
-          <Icon
-            class="text-[20px]"
-            name="ci:chevron-right"
-            width="40"
-            height="40"
-          />
+      <div class="flex justify-center mt-[40px] mb-[40px]">
+        <div class="flex justify-between gap-4 items-center">
+          <div
+            class="flex items-center justify-center w-[50px] h-[50px] rounded-full"
+            style="
+              border: 1.5px solid rgba(247, 163, 39, 1);
+              color: rgba(247, 163, 39, 1);
+            "
+          >
+            <Icon
+              class="text-[20px]"
+              name="ci:chevron-left"
+              width="40"
+              height="40"
+            />
+          </div>
+          <div class="flex gap-2">
+            <Icon
+              class="dotCirCle"
+              name="octicon:dot-fill-16"
+              width="16"
+              height="16"
+            />
+            <Icon
+              class="dotCirCle"
+              name="octicon:dot-fill-16"
+              width="16"
+              height="16"
+            />
+            <Icon
+              class="dotCirCle"
+              name="octicon:dot-fill-16"
+              width="16"
+              height="16"
+            />
+            <Icon
+              class="dotCirCle"
+              name="octicon:dot-fill-16"
+              width="16"
+              height="16"
+            />
+            <Icon
+              class="dotCirCle"
+              name="octicon:dot-fill-16"
+              width="16"
+              height="16"
+            />
+          </div>
+          <div
+            class="flex items-center justify-center w-[50px] h-[50px] rounded-full"
+            style="
+              background-color: rgba(247, 163, 39, 1);
+              color: rgba(255, 255, 255, 1);
+            "
+          >
+            <Icon
+              class="text-[20px]"
+              name="ci:chevron-right"
+              width="40"
+              height="40"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -208,6 +214,7 @@ export default defineComponent({
     const openTeamTournament: Ref<boolean> = ref(false);
     const openTeambatchTournament: Ref<boolean> = ref(false);
     const openAlert: Ref<boolean> = ref(false);
+    const isLoading = ref(true);
     const toast = useToast();
     const listTeam: Ref<undefined> = ref();
     const listData: Ref<team> = ref();
@@ -221,20 +228,27 @@ export default defineComponent({
     const handelClick = (index) => {
       activeIndex.value = index;
     };
-    const fnGetListTournamentTeam = () => {
-      TournamentStore.fnGetTeamsTournament(id)
-        .then((res) => {
-          listTeam.value = res;
-          listData.value = res.map((item) => {
-            return {
-              id: item.teamId,
-              name: item.name,
-            };
-          });
-        })
-        .catch((err) => {
-          console.log(err);
+    const fnGetListTournamentTeam = async () => {
+      const delay = new Promise(resolve => setTimeout(resolve, 500));
+      
+      try {
+        const [res] = await Promise.all([
+          TournamentStore.fnGetTeamsTournament(id),
+          delay
+        ]);
+        
+        listTeam.value = res;
+        listData.value = res.map((item) => {
+          return {
+            id: item.teamId,
+            name: item.name,
+          };
         });
+      } catch (err) {
+        console.log(err);
+      } finally {
+        isLoading.value = false;
+      }
     };
     const handleDellete = (item) => {
       openAlert.value = true;
@@ -269,6 +283,7 @@ export default defineComponent({
       openTeambatchTournament,
       openAlert,
       teamInfo,
+      isLoading,
       handleDellete,
       fnGetDelTeamTournament,
       handelClick,

@@ -26,7 +26,12 @@
         </div>
       </div>
     </div>
-    <div>
+    
+    <div v-if="isLoading" class="flex justify-center items-center py-20">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
+    </div>
+    
+    <div v-else>
       <div
         v-for="(item, index) in dataLeague"
         :key="index"
@@ -107,9 +112,12 @@ export default defineComponent({
     const id = route.params.tournament;
     const LeagueStore = useLeagueStore();
     const dataLeague: Ref<any[]> = ref([]);
+    const isLoading = ref(true);
+    
     onMounted(() => {
       fnGetListLeguage();
     });
+    
     const bangdau = [
       {
         id: 1,
@@ -171,20 +179,29 @@ export default defineComponent({
         diem: 0,
       },
     ];
-    const fnGetListLeguage = () => {
-      LeagueStore.fnGetLeague(id)
-        .then((res) => {
-          dataLeague.value = res;
-        })
-        .catch((err) => {
-          console.log(err, "err");
-        });
+    
+    const fnGetListLeguage = async () => {
+      const delay = new Promise(resolve => setTimeout(resolve, 500));
+      
+      try {
+        const [res] = await Promise.all([
+          LeagueStore.fnGetLeague(id),
+          delay
+        ]);
+        dataLeague.value = res;
+      } catch (err) {
+        console.log(err, "err");
+      } finally {
+        isLoading.value = false;
+      }
     };
+    
     return {
       dataLeague,
       bangdau,
       players,
       fnGetListLeguage,
+      isLoading,
     };
   },
 });

@@ -4,24 +4,28 @@ export const RankingRules = [
     name: "Thành tích đối kháng",
     tournamentId: 1,
     ranking: 1,
+    type: 1,
   },
   {
     id: 2,
     name: "Hiệu số giữa các đội bằng điểm",
     tournamentId: 2,
     ranking: 2,
+    type: 2,
   },
   {
     id: 3,
     name: "Tổng số bàn thắng giữa các đội bằng điểm",
     tournamentId: 3,
     ranking: 3,
+    type: 3,
   },
   {
     id: 4,
     name: "Điểm phong cách(Tổng số thẻ vàng,thẻ đỏ)",
     tournamentId: 4,
     ranking: 4,
+    type: 4,
   },
 ];
 export const hinhthuc = [

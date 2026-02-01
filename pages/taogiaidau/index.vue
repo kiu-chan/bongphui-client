@@ -241,6 +241,12 @@ export default defineComponent({
     const companyName = ref<string>("");
     const companyAddress = ref<string>("");
     const socialLink = ref<string>("");
+    
+    // THÊM CÁC TRƯỜNG MỚI
+    const numberOfTeams = ref<number | null>(null);
+    const broadcast = ref<string>("");
+    const fund = ref<number | null>(null);
+    const leagueFee = ref<number | null>(null);
 
     // files / image
     const selectedFile = ref<File | null>(null);
@@ -340,17 +346,36 @@ export default defineComponent({
       fnGetProvinces();
     });
 
-    const validate = (): boolean => {
-      // reset errors
-      Object.keys(errors.value).forEach((k) => (errors.value[k] = ""));
+    const validate = () => {
+      errors.value = {
+        name: "",
+        description: "",
+        startDate: "",
+        endDate: "",
+        country: "",
+        location: "",
+        competitionType: "",
+        numberOfPlayersPlay: "",
+        numberOfPlayersSubstitute: "",
+        drawScore: "",
+        winScore: "",
+        loseScore: "",
+        sponsor: "",
+        media: "",
+        phone: "",
+        companyName: "",
+        companyAddress: "",
+        socialLink: "",
+      };
 
       let hasError = false;
+
       if (!name.value || !name.value.trim()) {
         errors.value.name = "Vui lòng nhập tên giải đấu";
         hasError = true;
       }
       if (!description.value || !description.value.trim()) {
-        errors.value.description = "Vui lòng nhập mô tả mùa giải";
+        errors.value.description = "Vui lòng nhập mô tả";
         hasError = true;
       }
       if (!startDate.value) {
@@ -361,7 +386,7 @@ export default defineComponent({
         errors.value.endDate = "Vui lòng chọn ngày kết thúc";
         hasError = true;
       }
-      if (!country.value || !country.value.name) {
+      if (!country.value) {
         errors.value.country = "Vui lòng chọn khu vực";
         hasError = true;
       }
@@ -417,7 +442,7 @@ export default defineComponent({
         hasError = true;
       }
 
-      return !hasError; // return true if valid
+      return !hasError;
     };
 
     const onSubmit = async () => {
@@ -439,16 +464,20 @@ export default defineComponent({
         country: country.value?.name ?? "",
         location: location.value?.name ?? location.value ?? "",
         competitionType: competitionType.value?.id ?? competitionType.value ?? null,
+        numberOfTeams: numberOfTeams.value,
         numberOfPlayersPlay: numberOfPlayersPlay.value?.id ?? numberOfPlayersPlay.value ?? null,
         numberOfPlayersSubstitute: numberOfPlayersSubstitute.value?.id ?? numberOfPlayersSubstitute.value ?? null,
         drawScore: drawScore.value?.id ?? drawScore.value ?? null,
         winScore: winScore.value?.id ?? winScore.value ?? null,
         loseScore: loseScore.value?.id ?? loseScore.value ?? null,
         sponsor: sponsor.value,
+        broadcast: broadcast.value,
         media: media.value,
         phone: phone.value,
+        fund: fund.value,
         companyName: companyName.value,
         companyAddress: companyAddress.value,
+        leagueFee: leagueFee.value,
         socialLink: socialLink.value,
         rankingRules: rules.value,
       };
@@ -474,7 +503,7 @@ export default defineComponent({
         resetForm();
 
         if (newId) {
-          navigateTo(`/quanlygiaidau/${newId}/danhsachdoibong`);
+          navigateTo(`/quanlygiaidau/${newId}/bantochuc`);
         }
       } catch (err) {
         console.error(err);
@@ -501,6 +530,13 @@ export default defineComponent({
       companyName.value = "";
       companyAddress.value = "";
       socialLink.value = "";
+      
+      // RESET CÁC TRƯỜNG MỚI
+      numberOfTeams.value = null;
+      broadcast.value = "";
+      fund.value = null;
+      leagueFee.value = null;
+      
       selectedFile.value = null;
       imageForm.delete("file");
       rules.value = [...RankingRules];
@@ -510,7 +546,7 @@ export default defineComponent({
     const removeRule = (index: number) => rules.value.splice(index, 1);
     const addRule = () => {
       const lastId = rules.value.length ? rules.value[rules.value.length - 1].id : 0;
-      rules.value.push({ id: lastId + 1, name: "", tournamentId: lastId + 1, ranking: lastId + 1 });
+      rules.value.push({ id: lastId + 1, name: "", tournamentId: lastId + 1, ranking: lastId + 1, type: 0 });
     };
 
     return {
@@ -581,7 +617,7 @@ export default defineComponent({
 .form {
   margin-top: 40px;
   margin-bottom: 70px;
-  max-width: 1207px; /* same as earlier design width */
+  max-width: 1207px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -618,104 +654,91 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
+/* banner */
 .banner {
-  height: 408px;
-  width: 100%;
-  border-radius: 40px;
-  overflow: hidden;
   margin-top: 16px;
   position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+  height: 240px;
 }
-
 .banner-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
 }
-
 .banner-overlay {
   position: absolute;
-  left: 20px;
-  bottom: 20px;
+  left: 24px;
+  bottom: 24px;
   display: flex;
-  gap: 16px;
+  gap: 24px;
   align-items: center;
+}
+.tournament-name {
+  font-size: 32px;
+  font-weight: 600;
   color: #fff;
 }
 
-.title-block {
-  display: flex;
-  flex-direction: column;
-}
-
-.tournament-name {
-  font-size: 40px;
-  margin: 0;
-}
-
+/* form */
 .form-row {
-  margin-bottom: 16px;
+  margin: 16px 0;
 }
 
-/* grids */
 .grid-2 {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
-  margin-bottom: 16px;
+  margin: 16px 0;
 }
-
 .grid-3 {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 16px;
-  margin-bottom: 16px;
+  margin: 16px 0;
 }
-
 .grid-4 {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 1fr 3fr;
   gap: 16px;
-  align-items: end;
-  margin-bottom: 16px;
-}
-
-.col-span-3 {
-  grid-column: span 3;
+  margin: 16px 0;
 }
 .col-span-2 {
-  grid-column: span 2;
+  grid-column: span 2 / span 2;
+}
+.col-span-3 {
+  grid-column: span 3 / span 3;
 }
 
 /* rules */
 .rules {
-  margin: 20px 0;
+  margin: 16px 0;
 }
 .rules-list {
-  margin-top: 8px;
+  margin-top: 12px;
 }
 .rule-item {
   display: flex;
   gap: 12px;
   align-items: center;
-  padding: 8px;
-  border: 1px solid #dcd5d5;
-  border-radius: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 .rule-item input {
   flex: 1;
-  padding: 6px 8px;
-  border-radius: 6px;
+  padding: 10px;
   border: 1px solid #ccc;
+  border-radius: 8px;
 }
 .btn-delete {
-  background: transparent;
+  background: #dc2626;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
   border: none;
-  color: #eb0428;
   cursor: pointer;
 }
 .btn-add {
@@ -757,7 +780,6 @@ export default defineComponent({
 }
 
 /* submit */
-/* center and make button match form width */
 .submit-row {
   margin-top: 24px;
   display: flex;
@@ -776,7 +798,6 @@ export default defineComponent({
   font-size: 20px;
   border: none;
   cursor: pointer;
-  /* keep button full-width but constrained by .form max-width */
   display: inline-block;
 }
 
