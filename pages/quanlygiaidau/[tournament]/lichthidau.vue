@@ -25,7 +25,8 @@
             <div class="flex items-center gap-3 w-[40%] justify-start">
               <img
                 class="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 object-contain rounded-full team-logo"
-                :src="item?.homeTeam?.logoUrl"
+                :src="item?.homeTeam?.logoUrl || '/img/imglg.png'"
+                @error="$event.target.src='/img/imglg.png'"
                 alt=""
               />
 
@@ -50,7 +51,8 @@
 
               <img
                 class="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 object-contain rounded-full team-logo"
-                :src="item?.homeTeam?.logoUrl"
+                :src="item?.awayTeam?.logoUrl || '/img/imglg.png'"
+                @error="$event.target.src='/img/imglg.png'"
                 alt=""
               />
             </div>
@@ -65,7 +67,7 @@
           </div>
 
           <div
-            class="col-span-4 h-[100px] lichThidau flex items-center justify-between pl-[40px] relative"
+            class="col-span-4 h-[100px] lichThidau flex items-center justify-between pl-[40px] pr-[40px] relative"
           >
             <div>
               <div>
@@ -81,13 +83,20 @@
                 </p>
               </div>
             </div>
-            <div>
+            <div class="flex gap-3">
+              <Icon
+                @click="handleUpdate(item)"
+                name="hugeicons:pencil-edit-02"
+                width="24"
+                height="24"
+                style="color: #eb0428; cursor: pointer;"
+              />
               <Icon
                 @click="handleDetail(item.id)"
                 name="hugeicons:eye"
                 width="24"
                 height="24"
-                style="color: #eb0428"
+                style="color: #eb0428; cursor: pointer;"
               />
             </div>
           </div>

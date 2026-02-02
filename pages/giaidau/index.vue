@@ -23,7 +23,7 @@
                     Tạo giải đấu mới
                   </div>
                 </NuxtLink>
-                <NuxtLink to="/quanlygiaidau/1/danhsachdoibong">
+                <NuxtLink to="/quanlygiaidau/giaidaucuatoi">
                   <div
                     class="w-full sm:w-[180px] md:w-[232px] h-[50px] flex justify-center items-center font-medium text-[16px] rounded-2xl buttonAdd"
                   >

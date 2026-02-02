@@ -503,7 +503,7 @@ export default defineComponent({
         resetForm();
 
         if (newId) {
-          navigateTo(`/quanlygiaidau/${newId}/bantochuc`);
+          navigateTo(`/quanlygiaidau/giaidaucuatoi`);
         }
       } catch (err) {
         console.error(err);

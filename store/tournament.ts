@@ -89,6 +89,10 @@ export const useTournamentStore = defineStore("taogiaidau", {
       url: "/api/fees",
       methods: "POST",
     },
+    my_tournaments: {
+      url: "/api/tournaments/my-tournaments",
+      methods: "GET",
+    },
   }),
   actions: {
     async fnGetTournament(url: string) {
@@ -115,14 +119,20 @@ export const useTournamentStore = defineStore("taogiaidau", {
     // fees: list for tournament (GET /api/fees/tournament/{id})
     async fnGetFeesTournament(tournamentId: string | number) {
       const { $api } = useNuxtApp();
-      const url = this.fees_tournament.url.replaceAll(":tournamentId", String(tournamentId));
+      const url = this.fees_tournament.url.replaceAll(
+        ":tournamentId",
+        String(tournamentId)
+      );
       return await $api.get(url);
     },
 
     // balance: GET /api/fees/tournament/{id}/balance
     async fnGetFeesBalance(tournamentId: string | number) {
       const { $api } = useNuxtApp();
-      const url = this.fees_balance.url.replaceAll(":tournamentId", String(tournamentId));
+      const url = this.fees_balance.url.replaceAll(
+        ":tournamentId",
+        String(tournamentId)
+      );
       return await $api.get(url);
     },
 
@@ -191,6 +201,10 @@ export const useTournamentStore = defineStore("taogiaidau", {
       return await $api.post(
         this.add_matchesLeague.url.replaceAll(":id", String(id))
       );
+    },
+    async fnGetMyTournaments(url: string = "") {
+      const { $api } = useNuxtApp();
+      return await $api.get(`${this.my_tournaments.url}${url}`);
     },
   },
 });
