@@ -146,7 +146,7 @@
               <td class="px-4 py-2">
                 <input
                   type="number"
-                  v-model.number="item.goals"
+                  v-model.number="item.totalGoals"
                   placeholder="stt"
                   class="w-full border-b focus:outline-none bg-transparent"
                 />
@@ -171,61 +171,12 @@
           </tbody>
         </table>
       </div>
-
-      <!-- <div
-        class="col-span-2"
-        :style="{
-          height: 700 + 'px',
-        }"
-      >
-        <InputForm :name="'Tìm kiếm cầu thủ'" v-model="name" />
-        <div
-          class="app-container container mx-auto mt-[58px] px-4 sm:px-6 md:mt-16 grid w-full gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 2xl:gap-8"
-        >
-          <div
-            class="box-item relative"
-            v-for="(item, index) in filteredTeam"
-            :key="index"
-          >
-            <div
-              class="box-item__card z-[100] bg-[hsl(210_9.09%_4.31%)] h-[304px] w-full flex flex-wrap items-center justify-center rounded-2xl p-4 sm:rounded-[15px] overflow-hidden"
-            >
-              <Icon
-                name="hugeicons:pencil-edit-02"
-                @click="fnGet(item.player_id)"
-                class="icon checkbox absolute top-[20px] right-[10px] w-[18px] h-[18px]"
-                width="12"
-                height="12"
-                style="color: #258e26"
-              />
-
-              <div
-                class="flex items-center w-full justify-center box-item__card2"
-              >
-                <img
-                  loading="lazy"
-                  class="w-[170px] h-[170px] object-contain logoGreen"
-                  src="../../../assets/img/Chelsea_FC.svg.png"
-                  alt="logo"
-                />
-              </div>
-              <div>
-                <p
-                  class="text-2xl font-semibold text-secondary w-[full] text-center"
-                >
-                  {{ item.name }}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> -->
     </div>
   </popUpFull>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, toRefs, watch } from "vue";
+import { defineComponent, ref, toRefs, watch, type Ref, type PropType } from "vue";
 import popUpFull from "../../library/popupFull/index.vue";
 import InputForm from "../../library/input/index.vue";
 import SelectNebula from "../../library/selectNebula/index.vue";
@@ -239,10 +190,11 @@ interface mvpPlayer {
 
 interface Player {
   playerId: number;
+  player_id?: number;
   teamId: number;
   numberOfPlayer: number;
   reservePlayer: number;
-  goals?: number | string;
+  totalGoals?: number | string;
   yellowCards?: number | string;
   redCards?: number | string;
   name?: string;
@@ -262,19 +214,11 @@ interface Goal {
 interface Card {
   id: number;
   playerId: number;
+  playerName: string;
   cardTypeId: number;
   minuteGiven: string;
   numberOfPlayer: number;
   reservePlayer: number;
-}
-
-interface PostBody {
-  goals: Goal[];
-  cards: Card[];
-  mvpPlayerId: number;
-  teamWinner: number | null;
-  homeScore: number;
-  awayScore: number;
 }
 
 export default defineComponent({
@@ -286,9 +230,7 @@ export default defineComponent({
   props: {
     openPopup: Boolean,
     StatusMatch: {
-      type: Array as PropType<
-        Array<{ id: number; homeTeam: string; awayTeam: string }>
-      >,
+      type: Object as PropType<{ id: number; homeTeam: string; awayTeam: string }>,
       required: true,
     },
   },
@@ -302,8 +244,8 @@ export default defineComponent({
     const homeName: Ref<string> = ref("");
     const awayName: Ref<string> = ref("");
     const awayScore = ref<number | undefined>();
-    const homeId: Ref<number> = ref();
-    const awayId: Ref<number> = ref();
+    const homeId: Ref<number> = ref(0);
+    const awayId: Ref<number> = ref(0);
     const matchDateTime = ref<string>("");
     const refereeName = ref<string>("");
     const player1 = ref<Player[]>([]);
@@ -313,100 +255,204 @@ export default defineComponent({
     const mvpPLayer = ref<mvpPlayer[]>([]);
     const location = ref("Sân A vs B");
 
-    const postBody: PostBody = {
-      goals: [],
-      cards: [],
-      mvpPlayerId: 0,
-      teamWinner: null,
-      homeScore: 0,
-      awayScore: 0,
-    };
-
     watch(openPopup, (newVal) => {
       if (newVal) {
         fnGetPlayer();
         fnMatchDetail();
       }
     });
+    
     const fnGetPlayer = () => {
       MatchStore.fnGetPlayerManger(StatusMatch.value.id)
         .then((res) => {
           const teamNames = Object.keys(res);
 
           player1.value =
-            res[teamNames[0]].map((item) => {
+            res[teamNames[0]].map((item: any) => {
               return {
                 ...item,
                 teamId: awayId.value,
               };
             }) || [];
           player2.value =
-            res[teamNames[1]].map((item) => {
+            res[teamNames[1]].map((item: any) => {
               return {
                 ...item,
                 teamId: homeId.value,
               };
             }) || [];
-          console.log(player1.value, "chinh1");
-          console.log(player2.value, "chinh2");
-
-          // console.log(res, "chính");
+          
+          console.log("========== PLAYER DATA ==========");
+          console.log("Player 1 (Away Team):", player1.value);
+          console.log("Player 2 (Home Team):", player2.value);
+          console.log("=================================");
         })
         .catch((err) => {
-          console.log(err);
+          console.error("Error in fnGetPlayer:", err);
         });
     };
 
-    const fnAddTeams = () => {
-      postBody.mvpPlayerId = mvpPlayerId.value ?? 2;
-      postBody.homeScore = Number(homeScore.value);
-      postBody.awayScore = Number(awayScore.value);
-      allPlayers.value = [...player1.value, ...player2.value];
-      console.log(postBody, "chínhdzzzz");
-      allPlayers.value.forEach((player) => {
-        const teamId = player.teamId ?? 0;
+const fnAddTeams = () => {
+  // Khởi tạo postBody rỗng
+  const postBody: any = {};
+  
+  // Chỉ thêm homeScore nếu có giá trị
+  if (homeScore.value !== undefined && homeScore.value !== null && homeScore.value !== "") {
+    postBody.homeScore = Number(homeScore.value);
+  }
+  
+  // Chỉ thêm awayScore nếu có giá trị
+  if (awayScore.value !== undefined && awayScore.value !== null && awayScore.value !== "") {
+    postBody.awayScore = Number(awayScore.value);
+  }
+  
+  // Xác định đội thắng (chỉ khi có cả 2 tỉ số)
+  if (postBody.homeScore !== undefined && postBody.awayScore !== undefined) {
+    if (postBody.homeScore > postBody.awayScore) {
+      postBody.teamWinner = homeId.value;
+    } else if (postBody.awayScore > postBody.homeScore) {
+      postBody.teamWinner = awayId.value;
+    }
+  }
+  
+  allPlayers.value = [...player1.value, ...player2.value];
+  const goals: any[] = [];
+  const cards: any[] = [];
+  
+  allPlayers.value.forEach((player) => {
+    const teamId = player.teamId ?? 0;
+    const playerId = player?.player_id ?? player?.playerId ?? 0;
 
-        if (player.totalGoals && Number(player.totalGoals) > 0) {
-          postBody.goals.push({
-            id: 0,
-            playerName: player.name,
-            playerId: player?.player_id,
-            teamId,
-            goalTime: "",
-            goalAssistPlayerId: 0,
-            numberOfPlayer: player.numberOfPlayer ?? 0,
-            reservePlayer: player.reservePlayer ?? 0,
-          });
-        }
+    // Thêm bàn thắng
+    if (player.totalGoals && Number(player.totalGoals) > 0) {
+      for (let i = 0; i < Number(player.totalGoals); i++) {
+        const goal: any = {
+          playerId: playerId,
+          playerName: player.name ?? "",
+          teamId,
+          goalTime: "",
+          numberOfPlayer: player.numberOfPlayer ?? 0,
+          reservePlayer: player.reservePlayer ?? 0,
+        };
+        
+        // Chỉ thêm goalAssistPlayerId nếu có giá trị thực
+        // Không gửi nếu = 0 hoặc không có
+        // Backend sẽ tự xử lý trường này
+        
+        goals.push(goal);
+      }
+    }
 
-        // if (player.redCards && Number(player.redCards) > 0) {
-        //   postBody.redCard.push({
-        //     id: 0,
-        //     playerId: player.playerId,
-        //     cardTypeId: 2,
-        //     minuteGiven: "",
-        //     numberOfPlayer: player.numberOfPlayer,
-        //     reservePlayer: player.reservePlayer,
-        //   });
-        // }
+    // Thêm thẻ vàng
+    if (player.yellowCards && Number(player.yellowCards) > 0) {
+      for (let i = 0; i < Number(player.yellowCards); i++) {
+        cards.push({
+          playerId: playerId,
+          playerName: player.name ?? "",
+          cardTypeId: 1,
+          minuteGiven: "",
+          numberOfPlayer: player.numberOfPlayer ?? 0,
+          reservePlayer: player.reservePlayer ?? 0,
+        });
+      }
+    }
+
+    // Thêm thẻ đỏ
+    if (player.redCards && Number(player.redCards) > 0) {
+      for (let i = 0; i < Number(player.redCards); i++) {
+        cards.push({
+          playerId: playerId,
+          playerName: player.name ?? "",
+          cardTypeId: 2,
+          minuteGiven: "",
+          numberOfPlayer: player.numberOfPlayer ?? 0,
+          reservePlayer: player.reservePlayer ?? 0,
+        });
+      }
+    }
+  });
+
+  // Chỉ thêm goals nếu có dữ liệu
+  if (goals.length > 0) {
+    postBody.goals = goals;
+  }
+  
+  // Chỉ thêm cards nếu có dữ liệu
+  if (cards.length > 0) {
+    postBody.cards = cards;
+  }
+  
+  // Chỉ thêm mvpPlayerId nếu có giá trị
+  if (mvpPlayerId.value && mvpPlayerId.value > 0) {
+    postBody.mvpPlayerId = mvpPlayerId.value;
+  }
+
+  console.log("========== REQUEST DATA ==========");
+  console.log("Match ID:", StatusMatch.value.id);
+  console.log("Home Team ID:", homeId.value);
+  console.log("Away Team ID:", awayId.value);
+  console.log("Winner Team ID:", postBody.teamWinner);
+  console.log("POST BODY:", JSON.stringify(postBody, null, 2));
+  console.log("Fields sent:", Object.keys(postBody));
+  console.log("==================================");
+
+  // 1. Cập nhật kết quả trận đấu
+  MatchStore.fnUpdateMatchesTeam(StatusMatch.value.id, postBody)
+    .then((res) => {
+      console.log("========== STEP 1: Update Match Result ==========");
+      console.log("Response:", res);
+      console.log("=================================================");
+      
+      // 2. Cập nhật status thành COMPLETED
+      return MatchStore.fnUpdateMatchStatus(
+        StatusMatch.value.id,
+        "?status=COMPLETED"
+      );
+    })
+    .then((res) => {
+      console.log("========== STEP 2: Update Status ==========");
+      console.log("Response:", res);
+      console.log("===========================================");
+      
+      // 3. Kết thúc trận đấu
+      if (postBody.teamWinner) {
+        console.log("========== STEP 3: Complete Match ==========");
+        console.log("Winner ID:", postBody.teamWinner);
+        console.log("============================================");
+        return MatchStore.fnCompleteMatch(
+          StatusMatch.value.id,
+          postBody.teamWinner
+        );
+      }
+    })
+    .then((res) => {
+      console.log("========== FINAL RESULT ==========");
+      console.log("Response:", res);
+      console.log("==================================");
+      
+      toast.success({
+        message: "Cập nhật kết quả thành công",
+        position: "topRight",
       });
-
-      MatchStore.fnUpdateMatchesTeam(StatusMatch.value.id, postBody)
-        .then((res) => {
-          toast.success({
-            message: res,
-            position: "topRight",
-          });
-          ctx.emit("toggle");
-          ctx.emit("success");
-        })
-        .catch((err) => {
-          toast.success({
-            message: err,
-            position: "topRight",
-          });
-        });
-    };
+      ctx.emit("toggle");
+      ctx.emit("success");
+    })
+    .catch((err) => {
+      console.log("========== ERROR ==========");
+      console.error("Error details:", err);
+      console.error("Error response:", err?.response);
+      console.error("Error data:", err?.response?.data);
+      console.error("Error status:", err?.response?.status);
+      console.error("Error message:", err?.message);
+      console.log("===========================");
+      
+      toast.error({
+        message: "Cập nhật thất bại: " + (err?.response?.data?.message || err?.message || err),
+        position: "topRight",
+      });
+    });
+};
+    
     const fnMatchDetail = () => {
       MatchStore.fnMatchDetail(StatusMatch.value.id)
         .then((res) => {
@@ -416,11 +462,19 @@ export default defineComponent({
           homeName.value = res.homeTeam.name;
           awayId.value = res.awayTeam.id;
           homeId.value = res.homeTeam.id;
+          
+          console.log("========== MATCH DETAIL ==========");
+          console.log("Match ID:", StatusMatch.value.id);
+          console.log("Home Team:", res.homeTeam);
+          console.log("Away Team:", res.awayTeam);
+          console.log("Current Score:", res.homeScore, "-", res.awayScore);
+          console.log("==================================");
         })
         .catch((err) => {
-          console.log(err, "chính");
+          console.error("Error in fnMatchDetail:", err);
         });
     };
+    
     return {
       openPlayer: ref(false),
       homeScore,
@@ -439,6 +493,7 @@ export default defineComponent({
   },
 });
 </script>
+
 <style scoped>
 th,
 td {

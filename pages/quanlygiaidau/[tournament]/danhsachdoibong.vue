@@ -15,6 +15,19 @@
             border-radius: 10px;
           "
           class="flex justify-center items-center font-medium text-[20px] cursor-pointer"
+          @click="openManualMatch = true"
+        >
+          Tạo trận thủ công
+        </div>
+        <div
+          style="
+            width: 213px;
+            height: 50px;
+            border: 1px solid rgba(4, 184, 10, 1);
+            color: rgba(4, 184, 10, 1);
+            border-radius: 10px;
+          "
+          class="flex justify-center items-center font-medium text-[20px] cursor-pointer"
           @click="openTeamTournament = true"
         >
           Chia bảng đấu
@@ -161,6 +174,13 @@
       </div>
     </div>
 
+    <CreateManualMatch
+      :openPopup="openManualMatch"
+      :tournamentId="id"
+      :teams="listData"
+      @toggle="openManualMatch = false"
+      @success="handleManualMatchSuccess()"
+    />
     <CreatTeamBatch
       :openPopup="openTeambatchTournament"
       :id="id"
@@ -192,10 +212,13 @@ import { useTournamentStore } from "../../../store/tournament";
 import CreatTeamBatch from "../../../component/giaidau/creatTeambatchTournament/index.vue";
 import AlertMessage from "../../../component/library/alertMessage/index.vue";
 import Chiabang from "../../../component/giaidau/chiabang/index.vue";
+import CreateManualMatch from "../../../component/lichthidau/createManualMatch/index.vue";
+
 interface team {
   id: number;
   name: string;
 }
+
 export default defineComponent({
   name: "LeagueMatchList",
   components: {
@@ -203,6 +226,7 @@ export default defineComponent({
     CreatTeamBatch,
     AlertMessage,
     Chiabang,
+    CreateManualMatch,
   },
 
   setup() {
@@ -211,13 +235,15 @@ export default defineComponent({
     onMounted(() => {
       fnGetListTournamentTeam();
     });
+    
     const openTeamTournament: Ref<boolean> = ref(false);
     const openTeambatchTournament: Ref<boolean> = ref(false);
+    const openManualMatch: Ref<boolean> = ref(false);
     const openAlert: Ref<boolean> = ref(false);
     const isLoading = ref(true);
     const toast = useToast();
     const listTeam: Ref<undefined> = ref();
-    const listData: Ref<team> = ref();
+    const listData: Ref<team[]> = ref([]);
     const teamInfo: Ref<team> = ref({
       id: 0,
       name: "",
@@ -225,9 +251,11 @@ export default defineComponent({
     const id = router.params.tournament;
     const TournamentStore = useTournamentStore();
     const activeIndex = ref<number | null>(null);
-    const handelClick = (index) => {
+    
+    const handelClick = (index: number) => {
       activeIndex.value = index;
     };
+    
     const fnGetListTournamentTeam = async () => {
       const delay = new Promise(resolve => setTimeout(resolve, 500));
       
@@ -238,7 +266,7 @@ export default defineComponent({
         ]);
         
         listTeam.value = res;
-        listData.value = res.map((item) => {
+        listData.value = res.map((item: any) => {
           return {
             id: item.teamId,
             name: item.name,
@@ -250,13 +278,15 @@ export default defineComponent({
         isLoading.value = false;
       }
     };
-    const handleDellete = (item) => {
+    
+    const handleDellete = (item: any) => {
       openAlert.value = true;
       teamInfo.value = {
         id: item.teamId,
         name: item.name,
       };
     };
+    
     const fnGetDelTeamTournament = () => {
       TournamentStore.fnDelTeamTournament(teamInfo.value.id, id)
         .then((res) => {
@@ -274,6 +304,14 @@ export default defineComponent({
           });
         });
     };
+
+    const handleManualMatchSuccess = () => {
+      toast.success({
+        message: "Trận đấu đã được tạo thành công",
+        position: "topRight",
+      });
+    };
+    
     return {
       id,
       listTeam,
@@ -281,6 +319,7 @@ export default defineComponent({
       activeIndex,
       openTeamTournament,
       openTeambatchTournament,
+      openManualMatch,
       openAlert,
       teamInfo,
       isLoading,
@@ -288,6 +327,7 @@ export default defineComponent({
       fnGetDelTeamTournament,
       handelClick,
       fnGetListTournamentTeam,
+      handleManualMatchSuccess,
     };
   },
 });
@@ -301,40 +341,38 @@ export default defineComponent({
   clip-path: polygon(0 0, 84% 0, 100% 17%, 100% 100%, 17% 100%, 0 84%);
   height: 341px;
   width: 285px;
-  padding: 2.5px; /* tạo khoảng viền */
+  padding: 2.5px;
   box-sizing: border-box;
 }
 
 .cardGiaidau-click {
-  background: linear-gradient(
-    180deg,
-    #f17a3c 0%,
-    #131b77 100%
-  ); /* border gradient */
+  background: linear-gradient(180deg, #f17a3c 0%, #131b77 100%);
 }
+
 .cardGiaidau-noclick {
-  background: linear-gradient(
-    180deg,
-    #b0aeac 0%,
-    #b1aeac 100%
-  ); /* border gradient */
+  background: linear-gradient(180deg, #b0aeac 0%, #b1aeac 100%);
 }
+
 .cardAbsolute {
   width: 100%;
   height: 100%;
-  border-radius: 16px; /* nhỏ hơn border-radius ngoài 1 chút */
+  border-radius: 16px;
   background: linear-gradient(180deg, #fffefe 0%, #eeeae8 100%);
   clip-path: polygon(0 0, 84% 0, 100% 17%, 100% 100%, 17% 100%, 0 84%);
 }
+
 .cardAbsolute-click {
   background: linear-gradient(180deg, #fffefe 0%, #ffd7c3 100%);
 }
+
 .cardAbsolute-noclick {
   background: linear-gradient(180deg, #fffefe 0%, #eeeae8 100%);
 }
+
 .bangxephang {
   border: 1px solid var(--textsport);
 }
+
 .rowHover:hover {
   color: var(--textsport);
 }

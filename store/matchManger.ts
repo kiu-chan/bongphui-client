@@ -26,6 +26,14 @@ export const useMatchStore = defineStore("Match", {
       url: "/api/matches/update/:id",
       methods: "PUT",
     },
+    match_complete: {
+      url: "/api/matches/complete/:id",
+      methods: "PUT",
+    },
+    match_manual: {
+      url: "/api/matches/:tournamentId/matches/manual",
+      methods: "POST",
+    },
     match_new: {
       url: "/api/matches/newest",
       methods: "GET",
@@ -72,6 +80,17 @@ export const useMatchStore = defineStore("Match", {
       return await $api.put(
         `${this.match_status.url.replaceAll(":id", String(id))}${url}`
       );
+    },
+    async fnCompleteMatch(id: number, winnerId: number) {
+      const { $api } = useNuxtApp();
+      return await $api.put(
+        `${this.match_complete.url.replaceAll(":id", String(id))}?winnerId=${winnerId}`
+      );
+    },
+    async fnCreateManualMatch(tournamentId: number, payload: any) {
+      const { $api } = useNuxtApp();
+      const url = this.match_manual.url.replace(":tournamentId", String(tournamentId));
+      return await $api.post(url, payload);
     },
     async fnGetPlayer(matchId: any, playerId: any) {
       const { $api } = useNuxtApp();
