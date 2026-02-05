@@ -46,24 +46,15 @@
           Thêm nhiều đội bóng
         </div>
       </div>
-      <div style="margin-top: 50px" class="grid grid-cols-4 gap-8">
+      
+      <!-- Grid responsive giống trang đội bóng -->
+      <div style="margin-top: 50px" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 place-items-center">
         <div
           v-for="(item, index) in listTeam"
           :key="index"
-          class="cardGiaidau"
-          :class="[
-            activeIndex === index ? 'cardGiaidau-click' : 'cardGiaidau-noclick',
-          ]"
-          @click="handelClick(index)"
+          class="cardGiaidau w-full"
         >
-          <div
-            :class="[
-              activeIndex === index
-                ? 'cardAbsolute-click'
-                : 'cardAbsolute-noclick',
-            ]"
-            class="cardAbsolute relative flex flex-col justify-between items-center pl-[51px] pr-[51px] pt-[22px] pb-[22px]"
-          >
+          <div class="cardAbsolute relative flex flex-col justify-between items-center p-[16px]">
             <div class="absolute top-[20px] left-[14px]">
               <Icon
                 class="w-[24px] h-[24px]"
@@ -72,9 +63,9 @@
                 @click="handleDellete(item)"
               />
             </div>
-            <div class="max-w-[88px] max-h-[118px]">
+            <div class="max-w-[110px] h-[130px]">
               <img 
-                class="w-full h-full" 
+                class="w-full h-full object-contain" 
                 :src="item.logoUrl || '/img/imglg.png'" 
                 alt="" 
                 @error="$event.target.src = '/img/imglg.png'"
@@ -86,21 +77,17 @@
                   ? 'color :rgba(244, 134, 55, 1)'
                   : 'color :rgba(0, 0, 0, 1)',
               ]"
+              class="text-center"
             >
-              <h2 class="font-medium text-[25px] text-center">
+              <h2 style="width: 160px" class="font-medium text-[18px] mx-auto">
                 {{ item.name }}
               </h2>
-              <h3 class="font-normal text-[18px] text-center">
-                {{ item.home_stadium }}
-              </h3>
             </div>
             <div
-              :style="[
-                activeIndex === index
-                  ? 'background: linear-gradient(90deg,#ec7748 0%,#a545d6 100%)'
-                  : 'background :rgba(177, 174, 172, 1)',
-              ]"
-              style="color: rgba(255, 255, 255, 1)"
+              style="
+                color: rgba(255, 255, 255, 1);
+                background: linear-gradient(90deg, #ec7748 0%, #a545d6 100%);
+              "
               class="w-[138px] h-[40px] rounded-[5px] flex justify-center items-center font-normal text-[16px]"
             >
               Xem chi tiết
@@ -108,10 +95,11 @@
           </div>
         </div>
       </div>
+      
       <div class="flex justify-center mt-[40px] mb-[40px]">
         <div class="flex justify-between gap-4 items-center">
           <div
-            class="flex items-center justify-center w-[50px] h-[50px] rounded-full"
+            class="flex items-center justify-center w-[50px] h-[50px] rounded-full cursor-pointer"
             style="
               border: 1.5px solid rgba(247, 163, 39, 1);
               color: rgba(247, 163, 39, 1);
@@ -157,7 +145,7 @@
             />
           </div>
           <div
-            class="flex items-center justify-center w-[50px] h-[50px] rounded-full"
+            class="flex items-center justify-center w-[50px] h-[50px] rounded-full cursor-pointer"
             style="
               background-color: rgba(247, 163, 39, 1);
               color: rgba(255, 255, 255, 1);
@@ -334,39 +322,54 @@ export default defineComponent({
 </script>
 
 <style scoped>
+/* Thu nhỏ card để 5 cái vừa hàng - GIỐNG TRANG ĐỘI BÓNG */
 .cardGiaidau {
   position: relative;
   border-radius: 20px;
   background: linear-gradient(180deg, #b0aeac 0%, #b1aeac 100%);
   clip-path: polygon(0 0, 84% 0, 100% 17%, 100% 100%, 17% 100%, 0 84%);
-  height: 341px;
-  width: 285px;
-  padding: 2.5px;
+  height: 340px; /* giảm chiều cao */
+  width: 100%;
+  padding: 2px; /* tạo khoảng viền */
   box-sizing: border-box;
 }
 
-.cardGiaidau-click {
-  background: linear-gradient(180deg, #f17a3c 0%, #131b77 100%);
+.cardGiaidau:hover {
+  background: linear-gradient(
+    180deg,
+    #f17a3c 0%,
+    #131b77 100%
+  ); /* border gradient */
 }
 
 .cardGiaidau-noclick {
-  background: linear-gradient(180deg, #b0aeac 0%, #b1aeac 100%);
+  background: linear-gradient(
+    180deg,
+    #b0aeac 0%,
+    #b1aeac 100%
+  ); /* border gradient */
 }
 
 .cardAbsolute {
   width: 100%;
   height: 100%;
-  border-radius: 16px;
+  border-radius: 18px; /* nhỏ hơn border-radius ngoài 1 chút */
   background: linear-gradient(180deg, #fffefe 0%, #eeeae8 100%);
   clip-path: polygon(0 0, 84% 0, 100% 17%, 100% 100%, 17% 100%, 0 84%);
 }
 
-.cardAbsolute-click {
+.cardAbsolute:hover {
   background: linear-gradient(180deg, #fffefe 0%, #ffd7c3 100%);
 }
 
 .cardAbsolute-noclick {
   background: linear-gradient(180deg, #fffefe 0%, #eeeae8 100%);
+}
+
+.dotCirCle {
+  width: 15px;
+  height: 15px;
+  background-color: rgba(255, 229, 190, 1);
 }
 
 .bangxephang {

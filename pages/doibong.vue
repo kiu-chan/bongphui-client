@@ -5,106 +5,81 @@
       <div class="bg rounded-[29px]">
         <div class="bg2 rounded-t-[29px]">
           <div class="app-container container mx-auto">
-            <div class="flex justify-between items-center pt-[50px] mb-[46px]">
-              <div class="">
-                <h1 class="font-medium text-[45px]">Đội bóng</h1>
+            <!-- Header: responsive - trên mobile sẽ xếp cột, trên desktop hàng ngang -->
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-[46px] pt-[30px] md:pt-[50px]">
+              <div>
+                <!-- font-size responsive để không bị bó nghẹt trên mobile -->
+                <h1 class="font-medium text-[32px] md:text-[45px] leading-tight">Đội bóng</h1>
               </div>
-              <div class="flex justify-between gap-4">
-                <NuxtLink to="/taodoibong">
-                  <div
-                    class="w-[232px] h-[60px] flex justify-center items-center font-medium text-[20px] rounded-2xl buttonAdd cursor-pointer"
-                  >
-                    Tạo đội bóng mới
-                  </div>
-                </NuxtLink>
-                <NuxtLink to="../quanlydoibong/1/danhsach">
-                  <div
-                    style="
-                      background: linear-gradient(
-                        90deg,
-                        #e97552 0%,
-                        #a949cf 100%
-                      );
-                      color: rgba(255, 255, 255, 1);
-                    "
-                    class="w-[232px] h-[60px] flex justify-center items-center font-medium text-[20px] rounded-2xl cursor-pointer"
-                  >
-                    Đội bóng của tôi
-                  </div>
-                </NuxtLink>
-                <div class="search max-w-[397px] h-[60px] rounded-2xl relative">
-                  <input
-                    class="w-full h-full focus:outline-none focus:ring-0 pl-12 font-normal text-[20px]"
-                    type="text"
-                    placeholder="Tìm kiếm"
-                    v-model="keyword"
-                  />
-                  <Icon
-                    class="absolute IconSearch"
-                    name="hugeicons:search-02"
-                    width="24"
-                    height="24"
-                  />
-                </div>
+              
+              <div class="flex flex-wrap gap-4 mt-4 md:mt-0 items-center">
+                <!-- Chỉ hiện 2 nút này khi đã đăng nhập -->
+                <template v-if="isAuthenticated">
+                  <NuxtLink to="/taodoibong">
+                    <div
+                      class="w-full sm:w-[180px] md:w-[232px] h-[50px] flex justify-center items-center font-medium text-[16px] rounded-2xl buttonAdd cursor-pointer"
+                    >
+                      Tạo đội bóng mới
+                    </div>
+                  </NuxtLink>
+                  <NuxtLink to="../quanlydoibong/1/danhsach">
+                    <div
+                      class="w-full sm:w-[180px] md:w-[232px] h-[50px] flex justify-center items-center font-medium text-[16px] rounded-2xl buttonAdd cursor-pointer"
+                    >
+                      Đội bóng của tôi
+                    </div>
+                  </NuxtLink>
+                </template>
               </div>
             </div>
-            <div class="grid grid-cols-5 gap-8">
+            <!-- /Header -->
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 place-items-center">
               <div
                 v-for="(item, index) in listDataTeam"
                 :key="index"
-                class="cardGiaidau"
-                :class="[
-                  activeIndex === index
-                    ? 'cardGiaidau-click'
-                    : 'cardGiaidau-noclick',
-                ]"
-                @click="handelClick(index)"
+                class="cardGiaidau w-full"
               >
-                <div
-                  :class="[
-                    activeIndex === index
-                      ? 'cardAbsolute-click'
-                      : 'cardAbsolute-noclick',
-                  ]"
-                  class="cardAbsolute flex flex-col justify-between items-center pl-[51px] pr-[51px] pt-[22px] pb-[22px]"
-                >
-                  <div class="max-w-[88px] max-h-[118px]">
-                    <img class="w-full h-full" :src="item?.logoUrl" alt="" />
-                  </div>
-                  <div
-                    :style="[
-                      activeIndex === index
-                        ? 'color :rgba(244, 134, 55, 1)'
-                        : 'color :rgba(0, 0, 0, 1)',
-                    ]"
-                  >
-                    <h2 class="font-medium text-[25px] text-center">
-                      {{ item.name }}
-                    </h2>
-                    <h3 class="font-normal text-[18px] text-center">
-                      {{ item.time }}
-                    </h3>
-                  </div>
-                  <NuxtLink :to="`quanlydoibong/${item.teamId}/danhsach`">
+                <NuxtLink :to="`quanlydoibong/${item.teamId}/danhsach`">
+                  <div class="cardAbsolute flex flex-col justify-between items-center p-[16px]">
+                    <div class="max-w-[110px] h-[130px]">
+                      <img 
+                        class="w-full h-full object-contain" 
+                        :src="item?.logoUrl || '/img/imglg.png'" 
+                        alt="" 
+                        @error="$event.target.src = '/img/imglg.png'"
+                      />
+                    </div>
                     <div
                       :style="[
                         activeIndex === index
-                          ? 'background: linear-gradient(90deg,#ec7748 0%,#a545d6 100%)'
-                          : 'background :rgba(177, 174, 172, 1)',
+                          ? 'color :rgba(244, 134, 55, 1)'
+                          : 'color :rgba(0, 0, 0, 1)',
                       ]"
-                      style="color: rgba(255, 255, 255, 1)"
+                      class="text-center"
+                    >
+                      <h2 style="width: 160px" class="font-medium text-[18px] mx-auto">
+                        {{ item.name }}
+                      </h2>
+                    </div>
+                    <div
+                      style="
+                        color: rgba(255, 255, 255, 1);
+                        background: linear-gradient(90deg, #ec7748 0%, #a545d6 100%);
+                      "
                       class="w-[138px] h-[40px] rounded-[5px] flex justify-center items-center font-normal text-[16px]"
                     >
                       Xem chi tiết
                     </div>
-                  </NuxtLink>
-                </div>
+                  </div>
+                </NuxtLink>
               </div>
             </div>
+
             <div class="flex justify-center mt-[40px]">
               <div class="flex justify-between gap-4 items-center">
                 <div
-                  class="flex items-center justify-center w-[50px] h-[50px] rounded-full"
+                  class="flex items-center justify-center w-[50px] h-[50px] rounded-full cursor-pointer"
                   style="
                     border: 1.5px solid rgba(247, 163, 39, 1);
                     color: rgba(247, 163, 39, 1);
@@ -151,7 +126,7 @@
                   />
                 </div>
                 <div
-                  class="flex items-center justify-center w-[50px] h-[50px] rounded-full"
+                  class="flex items-center justify-center w-[50px] h-[50px] rounded-full cursor-pointer"
                   style="
                     background-color: rgba(247, 163, 39, 1);
                     color: rgba(255, 255, 255, 1);
@@ -167,6 +142,7 @@
                 </div>
               </div>
             </div>
+
             <div class="mt-[150px]">
               <div class="flex justify-between items-center">
                 <div>
@@ -174,7 +150,7 @@
                     style="color: rgba(0, 0, 0, 1)"
                     class="font-medium text-[45px]"
                   >
-                    Lịch thi đấu mới nhất
+                    Lịch thi đấu mới nhất
                   </h1>
                   <p
                     style="color: rgba(102, 102, 103, 1)"
@@ -231,12 +207,13 @@
                         class="flex items-center gap-3 w-[40%] justify-start"
                       >
                         <img
-                          class="w-[62px] h-[62px]"
-                          src="../assets/img/Chelsea_FC.svg.png"
+                          class="w-[62px] h-[62px] object-contain"
+                          :src="ite?.homeTeam?.logoUrl || '/img/imglg.png'"
                           alt=""
+                          @error="$event.target.src = '/img/imglg.png'"
                         />
                         <p class="font-semibold text-lg truncate">
-                          {{ ite?.homeTeam.name }}
+                          {{ ite?.homeTeam?.name }}
                         </p>
                       </div>
 
@@ -248,12 +225,13 @@
                       <!-- Team 2 -->
                       <div class="flex items-center gap-3 w-[40%] justify-end">
                         <p class="font-semibold text-lg truncate">
-                          {{ ite?.awayTeam.name }}
+                          {{ ite?.awayTeam?.name }}
                         </p>
                         <img
-                          class="w-[62px] h-[62px]"
-                          src="../assets/img/Chelsea_FC.svg.png"
+                          class="w-[62px] h-[62px] object-contain"
+                          :src="ite?.awayTeam?.logoUrl || '/img/imglg.png'"
                           alt=""
+                          @error="$event.target.src = '/img/imglg.png'"
                         />
                       </div>
                     </div>
@@ -278,6 +256,7 @@ import manCity from "../assets/img/manCity.png";
 import SliderBanner from "../component/library/sliderBanner/index.vue";
 import { useTeamStore } from "../store/team";
 import { useMatchStore } from "../store/matchManger";
+import { useAuthStore } from "../store/auth";
 interface Team {
   teamId: number;
   name: string;
@@ -359,6 +338,11 @@ export default defineComponent({
     SliderBanner,
   },
   setup() {
+    const authStore = useAuthStore();
+    
+    // Kiểm tra trạng thái đăng nhập
+    const isAuthenticated = computed(() => authStore.isAuthenticated);
+    
     const limit = 10;
     const offset: Ref<number> = ref(1);
     const keyword: Ref<string> = ref("");
@@ -383,7 +367,7 @@ export default defineComponent({
         tiso: "2:1",
         name1: "Manchester United",
         name2: "Manchester City",
-        nameTourn: "Trận đấu Cup 2025",
+        nameTourn: "Trận đấu Cup 2025",
         time: "11/09/2025 , Manchester United Old Trafford",
       },
       {
@@ -392,7 +376,7 @@ export default defineComponent({
         tiso: "2:1",
         name1: "Manchester United",
         name2: "Manchester City",
-        nameTourn: "Trận đấu Cup 2025",
+        nameTourn: "Trận đấu Cup 2025",
         time: "11/09/2025 , Manchester United Old Trafford",
       },
     ];
@@ -425,6 +409,7 @@ export default defineComponent({
     };
 
     return {
+      isAuthenticated,
       handelClick,
       item,
       activeIndex,
@@ -437,13 +422,29 @@ export default defineComponent({
 });
 </script>
 <style scoped>
+.bg {
+  background-color: rgba(255, 255, 255, 1);
+}
+.bg2 {
+  background: linear-gradient(
+    180deg,
+    rgba(232, 243, 248, 1) 0%,
+    rgba(255, 255, 255, 1) 99.98%
+  );
+}
+
 .buttonAdd {
   border: 1px solid rgba(4, 184, 10, 1);
   color: rgba(4, 184, 10, 1);
 }
+/* ensure the mobile full-width buttons look good */
+.buttonAdd {
+  display: inline-flex;
+  text-align: center;
+}
+
 .search {
   border: 1px solid rgba(177, 174, 172, 1);
-
   background: rgba(255, 255, 255, 1);
 }
 .IconSearch {
@@ -454,18 +455,19 @@ export default defineComponent({
   border-width: 2px;
 }
 
+/* Thu nhỏ card để 5 cái vừa hàng - GIỐNG TRANG GIẢI ĐẤU */
 .cardGiaidau {
   position: relative;
   border-radius: 20px;
   background: linear-gradient(180deg, #b0aeac 0%, #b1aeac 100%);
   clip-path: polygon(0 0, 84% 0, 100% 17%, 100% 100%, 17% 100%, 0 84%);
-  height: 341px;
-  max-width: 285px;
-  padding: 2.5px; /* tạo khoảng viền */
+  height: 340px; /* giảm chiều cao */
+  width: 100%;
+  padding: 2px; /* tạo khoảng viền */
   box-sizing: border-box;
 }
 
-.cardGiaidau-click {
+.cardGiaidau:hover {
   background: linear-gradient(
     180deg,
     #f17a3c 0%,
@@ -482,19 +484,34 @@ export default defineComponent({
 .cardAbsolute {
   width: 100%;
   height: 100%;
-  border-radius: 16px; /* nhỏ hơn border-radius ngoài 1 chút */
+  border-radius: 18px; /* nhỏ hơn border-radius ngoài 1 chút */
   background: linear-gradient(180deg, #fffefe 0%, #eeeae8 100%);
   clip-path: polygon(0 0, 84% 0, 100% 17%, 100% 100%, 17% 100%, 0 84%);
 }
-.cardAbsolute-click {
+.cardAbsolute:hover {
   background: linear-gradient(180deg, #fffefe 0%, #ffd7c3 100%);
 }
 .cardAbsolute-noclick {
   background: linear-gradient(180deg, #fffefe 0%, #eeeae8 100%);
 }
+
 .dotCirCle {
   width: 15px;
   height: 15px;
   background-color: rgba(255, 229, 190, 1);
+}
+
+/* Responsive adjustments if needed */
+@media (max-width: 768px) {
+  .app-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (min-width: 1600px) {
+  .listCardGiaiDau {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
 }
 </style>

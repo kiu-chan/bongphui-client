@@ -14,8 +14,8 @@
                 </h1>
               </div>
 
-              <!-- Buttons: wrap trên mobile, fixed-width trên desktop -->
-              <div class="flex flex-wrap gap-4 mt-4 md:mt-0 items-center">
+              <!-- Buttons: wrap trên mobile, fixed-width trên desktop - Chỉ hiện khi đã đăng nhập -->
+              <div v-if="isAuthenticated" class="flex flex-wrap gap-4 mt-4 md:mt-0 items-center">
                 <NuxtLink to="/taogiaidau">
                   <div
                     class="w-full sm:w-[180px] md:w-[232px] h-[50px] flex justify-center items-center font-medium text-[16px] rounded-2xl buttonAdd"
@@ -220,15 +220,21 @@
   </main>
 </template>
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch } from "vue";
+import { defineComponent, ref, onMounted, watch, computed } from "vue";
 import SliderBanner from "../component/library/sliderBanner/index.vue";
 import { useTournamentStore } from "../store/tournament";
+import { useAuthStore } from "../store/auth";
 
 export default defineComponent({
   components: {
     SliderBanner,
   },
   setup() {
+    const authStore = useAuthStore();
+    
+    // Kiểm tra trạng thái đăng nhập
+    const isAuthenticated = computed(() => authStore.isAuthenticated);
+
     // ongoing (preview)
     const listData = ref<any[]>([]);
     const listDataFeartured = ref<any[]>([]);
@@ -380,6 +386,7 @@ export default defineComponent({
     const activeIndex = ref<number | null>(null);
 
     return {
+      isAuthenticated,
       offset2,
       offset3,
       keywordCompleted,

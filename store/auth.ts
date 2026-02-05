@@ -1,24 +1,52 @@
+// store/auth.ts
 import { defineStore } from "pinia";
+import { decodeJWT, isTokenExpired, type JwtPayload } from "~/utils/jwt";
+import type { UserRole } from "~/config/routes";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     token: (process.client && (localStorage.getItem("auth_token") || sessionStorage.getItem("auth_token"))) || null,
-    user: null as null | Record<string, any>,
+    user: null as null | JwtPayload,
   }),
   getters: {
-    isAuthenticated: (state) => !!state.token,
+    isAuthenticated: (state) => !!state.token && !!state.user && !isTokenExpired(state.user),
+    userRole: (state): UserRole => {
+      if (!state.user) return 'GUEST';
+      return state.user.role as UserRole;
+    },
+    userId: (state) => state.user?.id || null,
+    username: (state) => state.user?.sub || null,
   },
   actions: {
     setToken(token: string | null, persist: boolean = true) {
       this.token = token;
+      
+      // Giải mã JWT để lấy thông tin user
+      if (token) {
+        const decoded = decodeJWT(token);
+        if (decoded && !isTokenExpired(decoded)) {
+          this.user = decoded;
+        } else {
+          this.user = null;
+          token = null;
+        }
+      } else {
+        this.user = null;
+      }
+      
       try {
         if (process.client) {
-          if (persist) {
-            localStorage.setItem("auth_token", token ?? "");
-            sessionStorage.removeItem("auth_token");
+          if (token) {
+            if (persist) {
+              localStorage.setItem("auth_token", token);
+              sessionStorage.removeItem("auth_token");
+            } else {
+              sessionStorage.setItem("auth_token", token);
+              localStorage.removeItem("auth_token");
+            }
           } else {
-            sessionStorage.setItem("auth_token", token ?? "");
             localStorage.removeItem("auth_token");
+            sessionStorage.removeItem("auth_token");
           }
         }
       } catch (e) {

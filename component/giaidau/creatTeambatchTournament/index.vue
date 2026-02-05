@@ -21,11 +21,11 @@
         />
       </div>
       <div
-        class="app-container container place-items-center mx-auto mt-[58px] px-4 sm:px-6 md:mt-16 grid w-full gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 2xl:gap-8"
+        class="app-container container place-items-center mx-auto mt-[58px] px-4 sm:px-6 md:mt-16 grid w-full gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
       >
-        <div v-for="(item, index) in listData" :key="index" class="cardGiaidau">
+        <div v-for="(item, index) in listData" :key="index" class="cardGiaidau w-full">
           <div
-            class="cardAbsolute flex flex-col relative justify-between items-center pl-[51px] pr-[51px] pt-[22px] pb-[22px]"
+            class="cardAbsolute flex flex-col relative justify-between items-center p-[16px]"
           >
             <input
               type="checkbox"
@@ -33,16 +33,18 @@
               v-model="selectedIds"
               class="checkbox absolute top-[20px] left-[10px] w-[18px] h-[18px]"
             />
-            <div class="max-w-[88px] max-h-[118px]">
-              <img class="w-full h-full" :src="item?.logoUrl" alt="" />
+            <div class="max-w-[110px] h-[130px]">
+              <img 
+                class="w-full h-full object-contain" 
+                :src="item?.logoUrl || '/img/imglg.png'" 
+                alt="" 
+                @error="$event.target.src = '/img/imglg.png'"
+              />
             </div>
-            <div>
-              <h2 class="font-medium text-[25px] text-center">
+            <div class="text-center">
+              <h2 style="width: 160px" class="font-medium text-[18px] mx-auto">
                 {{ item.name }}
               </h2>
-              <h3 class="font-normal text-[18px] text-center">
-                {{ item.time }}
-              </h3>
             </div>
           </div>
         </div>
@@ -143,24 +145,26 @@ export default defineComponent({
 });
 </script>
 <style scoped>
+/* Thu nhỏ card để vừa hàng - GIỐNG TRANG ĐỘI BÓNG */
 .cardGiaidau {
   position: relative;
   border-radius: 20px;
   background: linear-gradient(180deg, #b0aeac 0%, #b1aeac 100%);
   clip-path: polygon(0 0, 84% 0, 100% 17%, 100% 100%, 17% 100%, 0 84%);
-  height: 341px;
-  max-width: 285px;
-  padding: 2.5px; /* tạo khoảng viền */
+  height: 340px; /* giảm chiều cao */
+  width: 100%;
+  padding: 2px; /* tạo khoảng viền */
   box-sizing: border-box;
 }
 
-.cardGiaidau-click {
+.cardGiaidau:hover {
   background: linear-gradient(
     180deg,
     #f17a3c 0%,
     #131b77 100%
   ); /* border gradient */
 }
+
 .cardGiaidau-noclick {
   background: linear-gradient(
     180deg,
@@ -168,16 +172,19 @@ export default defineComponent({
     #b1aeac 100%
   ); /* border gradient */
 }
+
 .cardAbsolute {
-  width: 254px;
+  width: 100%;
   height: 100%;
-  border-radius: 16px; /* nhỏ hơn border-radius ngoài 1 chút */
+  border-radius: 18px; /* nhỏ hơn border-radius ngoài 1 chút */
   background: linear-gradient(180deg, #fffefe 0%, #eeeae8 100%);
   clip-path: polygon(0 0, 84% 0, 100% 17%, 100% 100%, 17% 100%, 0 84%);
 }
-.cardAbsolute-click {
+
+.cardAbsolute:hover {
   background: linear-gradient(180deg, #fffefe 0%, #ffd7c3 100%);
 }
+
 .cardAbsolute-noclick {
   background: linear-gradient(180deg, #fffefe 0%, #eeeae8 100%);
 }
