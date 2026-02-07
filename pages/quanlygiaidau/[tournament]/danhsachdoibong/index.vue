@@ -88,7 +88,8 @@
                 color: rgba(255, 255, 255, 1);
                 background: linear-gradient(90deg, #ec7748 0%, #a545d6 100%);
               "
-              class="w-[138px] h-[40px] rounded-[5px] flex justify-center items-center font-normal text-[16px]"
+              class="w-[138px] h-[40px] rounded-[5px] flex justify-center items-center font-normal text-[16px] cursor-pointer hover:opacity-90 transition-opacity"
+              @click="handleViewDetail(item.teamId)"
             >
               Xem chi tiết
             </div>
@@ -195,12 +196,12 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, type Ref } from "vue";
-import TournamentHeader from "../../../component/taogiaidau/tournamentHeader.vue";
-import { useTournamentStore } from "../../../store/tournament";
-import CreatTeamBatch from "../../../component/giaidau/creatTeambatchTournament/index.vue";
-import AlertMessage from "../../../component/library/alertMessage/index.vue";
-import Chiabang from "../../../component/giaidau/chiabang/index.vue";
-import CreateManualMatch from "../../../component/lichthidau/createManualMatch/index.vue";
+import TournamentHeader from "../../../../component/taogiaidau/tournamentHeader.vue";
+import { useTournamentStore } from "../../../../store/tournament";
+import CreatTeamBatch from "../../../../component/giaidau/creatTeambatchTournament/index.vue";
+import AlertMessage from "../../../../component/library/alertMessage/index.vue";
+import Chiabang from "../../../../component/giaidau/chiabang/index.vue";
+import CreateManualMatch from "../../../../component/lichthidau/createManualMatch/index.vue";
 
 interface team {
   id: number;
@@ -219,6 +220,7 @@ export default defineComponent({
 
   setup() {
     const router = useRoute();
+    const navigateRouter = useRouter();
 
     onMounted(() => {
       fnGetListTournamentTeam();
@@ -299,6 +301,10 @@ export default defineComponent({
         position: "topRight",
       });
     };
+
+    const handleViewDetail = (teamId: number) => {
+      navigateRouter.push(`/quanlygiaidau/${id}/danhsachdoibong/${teamId}/danhsachthanhvien`);
+    };
     
     return {
       id,
@@ -316,6 +322,7 @@ export default defineComponent({
       handelClick,
       fnGetListTournamentTeam,
       handleManualMatchSuccess,
+      handleViewDetail,
     };
   },
 });

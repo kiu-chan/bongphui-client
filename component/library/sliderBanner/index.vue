@@ -1,9 +1,9 @@
 <template>
-  <div class="banner">
-    <div class="grid grid-cols-10">
-      <div class="col-span-4 mt-[136px]">
+  <div class="banner pb-30 md:pb-0">
+    <div class="grid grid-cols-1 md:grid-cols-10">
+      <div class="col-span-1 md:col-span-4 mt-8 md:mt-[136px] px-4 md:px-0">
         <div class="flex items-center">
-          <div class="w-[120px] flex justify-center">
+          <div class="w-[120px] justify-center hidden md:flex">
             <ul>
               <template v-for="(ite, index) in item" :key="index">
                 <li
@@ -23,21 +23,21 @@
           <div>
             <h3
               style="color: rgba(247, 163, 39, 1)"
-              class="font-medium text-[50px]"
+              class="font-medium text-2xl md:text-[50px]"
             >
-              Giải đấu việt
+              Giải đấu việt
             </h3>
             <h1
               style="color: rgba(245, 245, 245, 1)"
-              class="font-bold text-[70px]"
+              class="font-bold text-3xl md:text-[70px] leading-tight"
             >
-              NÂNG TẦM <br />
-              THỂ THAO VIỆT
+              NÂNG TẦM <br />
+              THỂ THAO VIỆT
             </h1>
           </div>
         </div>
       </div>
-      <div class="col-span-6 max-w-[981px] max-h-[860px]">
+      <div class="col-span-1 md:col-span-6 md:max-w-[981px] md:max-h-[860px] mt-6 md:mt-0 hidden md:block">
         <img
           class="bannerImg w-full h-full contain"
           :key="banner"

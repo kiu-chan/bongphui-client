@@ -12,7 +12,7 @@
             Quay lại
           </button>
           <h1 class="text-2xl lg:text-3xl font-semibold text-gray-800 mt-3">Đội tham dự</h1>
-          <p class="text-sm text-gray-500 mt-1">Danh sách đội trong giải đấu ID: <span class="font-medium">{{ tournamentId }}</span></p>
+          <p class="text-sm text-gray-500 mt-1">Danh sách đội trong giải đấu</p>
         </div>
 
         <div class="flex items-center gap-3">
