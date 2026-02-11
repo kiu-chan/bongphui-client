@@ -1,187 +1,180 @@
 <template>
-  <div class="background-taodoibong flex justify-center">
-    <div class="container app-container mt-4">
-      <div>
-        <div class="flex justify-between items-center cursor-pointer">
-          <NuxtLink to="/doibong">
-            <div class="flex justify-between items-center gap-2">
-              <div
-                style="background: rgba(245, 245, 245, 1)"
-                class="w-[54px] h-[54px] rounded-full flex justify-center items-center"
-              >
-                <Icon
-                  class="text-[20px]"
-                  name="ci:chevron-left"
-                  width="40"
-                  height="40"
-                />
-              </div>
-              <h3>Quay lại</h3>
-            </div>
-          </NuxtLink>
-          <div
-            style="background: rgba(245, 245, 245, 1)"
-            class="w-[54px] h-[54px] rounded-full flex justify-center items-center"
-          >
-            <Icon
-              class="text-[20px]"
-              name="hugeicons:settings-01"
-              width="24"
-              height="24"
-            />
-          </div>
-        </div>
+  <div class="background-taodoibong min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-50">
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-6">
+        <NuxtLink to="/doibong">
+          <button class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white shadow-md hover:shadow-lg transition-all">
+            <Icon name="mdi:arrow-left" class="text-[20px] text-gray-700" />
+            <span class="font-medium text-gray-700 hidden sm:inline">Quay lại</span>
+          </button>
+        </NuxtLink>
+        
+        <h1 class="text-xl md:text-2xl font-bold text-gray-800 flex-1 text-center">
+          Tạo đội bóng mới
+        </h1>
+
+        <button class="w-10 h-10 rounded-lg bg-white shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+          <Icon name="mdi:cog" class="text-[20px] text-gray-700" />
+        </button>
       </div>
-      <div
-        class="h-[408px] w-full rounded-[40px] overflow-hidden mt-4 relative"
-      >
-        <img class="h-full w-full object-cover" :src="hereWego" alt="" />
-        <div class="logoTeam flex gap-4 items-center">
-          <InputImage :width="188" :height="188" @image="handleImage" />
-          <h2
-            style="color: rgba(255, 255, 255, 1)"
-            class="font-medium text-[40px]"
-          >
-            {{ name }}
+
+      <!-- Hero Banner -->
+      <div class="hero-banner relative h-64 md:h-96 w-full rounded-2xl overflow-hidden mb-8 shadow-xl">
+        <img class="h-full w-full object-cover" :src="hereWego" alt="Team banner" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+        
+        <div class="logo-section absolute bottom-4 left-4 right-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+          <InputImage 
+            :width="windowWidth < 640 ? 100 : 140" 
+            :height="windowWidth < 640 ? 100 : 140" 
+            @image="handleImage" 
+            class="flex-shrink-0"
+          />
+          <h2 class="text-white font-bold text-2xl sm:text-3xl md:text-4xl drop-shadow-lg">
+            {{ displayName }}
           </h2>
         </div>
       </div>
-      <div class="mt-[70px] mb-[70px] flex flex-wrap justify-center">
-        <div class="w-[1207px]">
-          <div class="w-full mb-3">
+
+      <!-- Form -->
+      <div class="form-container bg-white rounded-2xl shadow-xl p-6 md:p-8">
+        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+          <Icon name="mdi:information" class="text-orange-500" />
+          Thông tin đội bóng
+        </h3>
+
+        <div class="space-y-4">
+          <!-- Tên đội -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <Icon name="mdi:shield-star" class="inline text-orange-500" /> Tên đội bóng <span class="text-red-500">*</span>
+            </label>
             <InputForm
               v-model="name"
-              :name="'Tên đội bóng'"
-              :placeHolder="'Tên đội bóng'"
+              :name="''"
+              :placeHolder="'Nhập tên đội bóng'"
             />
           </div>
 
-          <!-- Ô Khu vực -->
-          <div class="w-full mb-3">
-            <InputForm
-              v-model="date"
-              :name="'Năm thành lập đội bóng'"
-              :placeHolder="'Năm thành lập đội bóng'"
-            />
+          <!-- Năm thành lập - DROPDOWN với border rõ ràng -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <Icon name="mdi:calendar" class="inline text-orange-500" /> Năm thành lập
+            </label>
+            <div class="relative">
+              <select 
+                v-model="date" 
+                class="dropdown-select w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white transition-all appearance-none cursor-pointer"
+                :class="date ? 'border-orange-300 text-gray-900' : 'border-gray-300 text-gray-500'"
+              >
+                <option :value="undefined" disabled>Chọn năm thành lập</option>
+                <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
+              </select>
+              <Icon name="mdi:chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            </div>
           </div>
-          <div class="w-full mb-3">
+
+          <!-- Username -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <Icon name="mdi:at" class="inline text-orange-500" /> Username
+            </label>
             <InputForm
               v-model="username"
-              :name="'@UserName'"
-              :placeHolder="'@UserName'"
+              :name="''"
+              :placeHolder="'@username'"
             />
           </div>
-          <div class="w-full mb-3">
-            <inputArea v-model="description" :name="'Giới thiệu'" />
+
+          <!-- Giới thiệu -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <Icon name="mdi:text" class="inline text-orange-500" /> Giới thiệu
+            </label>
+            <inputArea v-model="description" :name="''" />
           </div>
-          <div class="grid grid-cols-2 gap-4 mb-3">
-            <div class="col-span-1">
-              <InputForm
-                v-model="nameCoach"
-                :name="'Tên HLV'"
-                :placeHolder="'Tên huấn luyện viên'"
-              />
-            </div>
-            <div class="col-span-1">
-              <InputForm
-                v-model="nationality"
-                :name="'Quốc tịch'"
-                :placeHolder="'Quốc tịch'"
-              />
+        </div>
+
+        <!-- Thông tin HLV -->
+        <h3 class="text-xl font-bold text-gray-800 mt-8 mb-6 flex items-center gap-2">
+          <Icon name="mdi:whistle" class="text-orange-500" />
+          Thông tin huấn luyện viên
+        </h3>
+
+        <div class="space-y-4">
+          <!-- Tên HLV -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <Icon name="mdi:account" class="inline text-orange-500" /> Tên HLV
+            </label>
+            <InputForm
+              v-model="nameCoach"
+              :name="''"
+              :placeHolder="'Nhập tên huấn luyện viên'"
+            />
+          </div>
+
+          <!-- Quốc tịch - DROPDOWN với border rõ ràng -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <Icon name="mdi:flag" class="inline text-orange-500" /> Quốc tịch
+            </label>
+            <div class="relative">
+              <select 
+                v-model="nationality" 
+                class="dropdown-select w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white transition-all appearance-none cursor-pointer"
+                :class="nationality ? 'border-orange-300 text-gray-900' : 'border-gray-300 text-gray-500'"
+              >
+                <option value="" disabled>Chọn quốc tịch</option>
+                <option v-for="country in countries" :key="country" :value="country">{{ country }}</option>
+              </select>
+              <Icon name="mdi:chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
             </div>
           </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div class="col-span-1">
-              <DatePicker v-model="birthdate" :name="'Ngày sinh'" />
+
+          <!-- Grid 2 columns on desktop, 1 on mobile -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Ngày sinh -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                <Icon name="mdi:cake-variant" class="inline text-orange-500" /> Ngày sinh
+              </label>
+              <DatePicker v-model="birthdate" :name="''" />
             </div>
-            <div class="col-span-1">
+
+            <!-- CCCD -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                <Icon name="mdi:card-account-details" class="inline text-orange-500" /> CCCD
+              </label>
               <InputForm
                 v-model="cccd"
-                :name="'Căn cước công dân'"
-                :placeHolder="'Căn cước công dân'"
+                :name="''"
+                :placeHolder="'Nhập số CCCD'"
               />
             </div>
           </div>
-          <!-- Ô Địa chỉ -->
+        </div>
 
-          <!-- <div>
-            <span>Điều lệ mùa giải</span>
-            <div>
-              <div
-                style="background: rgba(4, 184, 10, 0.14); border-radius: 15px"
-                class="flex justify-center gap-2 items-center w-[200px] h-[60px]"
-              >
-                <Icon
-                  name="ic:baseline-arrow-circle-down"
-                  width="24"
-                  height="24"
-                  style="color: #4ec718; width: 47px; height: 31px"
-                />
-                <span>Dowload file</span>
-              </div>
-            </div>
-          </div>
-          <h3
-            class="font-normal text-[25px] mt-3 mb-4"
-            style="color: rgba(244, 134, 55, 1)"
-          >
-            Nhà tài trợ (Cho lần đầu)
-          </h3>
-          <div class="max-w-[828px]">
-            <InputForm
-              :name="'Tên doanh nghiệp nhà tài trợ'"
-              :placeHolder="'Nhập thông tin'"
-            />
-          </div>
-          <div
-            style="color: rgba(0, 0, 0, 1)"
-            class="font-Medium text-[30px] mt-5 mb-5"
-          >
-            THÔNG TIN LIÊN HỆ
-          </div>
-          <div class="grid grid-cols-2 gap-4 items-end mb-3">
-            <div class="col-span-1">
-              <InputForm
-                :name="'Tên công ty'"
-                :placeHolder="'Nhập thông tin'"
-              />
-            </div>
-            <div class="col-span-1">
-              <InputForm
-                :name="'Mạng xã hội'"
-                :placeHolder="'VD:http://localhost:3000/taogiaidau'"
-              />
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-4 items-end">
-            <div class="col-span-1">
-              <InputForm
-                :name="'Số điện thoại'"
-                :placeHolder="'Nhập số điện thoại'"
-              />
-            </div>
-            <div class="col-span-1">
-              <InputForm
-                :name="'Địa chỉ công ty'"
-                :placeHolder="'Nhập địa chỉ'"
-              />
-            </div>
-          </div> -->
-          <div
-            style="
-              border-radius: 15px;
-              background: linear-gradient(90deg, #04b80a 0%, #04b80a 100%);
-            "
+        <!-- Submit Button -->
+        <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center sm:justify-start">
+          <button
             @click="handelTeamadd"
-            class="w-[309px] h-[70px] flex justify-center items-center mt-8"
+            :disabled="isSubmitting"
+            class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            <p
-              style="color: rgba(255, 255, 255, 1)"
-              class="font-medium text-[25px]"
-            >
-              Xác nhận
-            </p>
-          </div>
+            <Icon v-if="isSubmitting" name="mdi:loading" class="animate-spin inline" />
+            {{ isSubmitting ? 'Đang xử lý...' : 'Tạo đội bóng' }}
+          </button>
+
+          <button
+            @click="fnReset"
+            type="button"
+            class="w-full sm:w-auto px-8 py-4 rounded-xl border-2 border-gray-300 text-gray-700 font-bold text-lg hover:bg-gray-50 transition-all"
+          >
+            Đặt lại
+          </button>
         </div>
       </div>
     </div>
@@ -189,12 +182,10 @@
 </template>
 
 <script lang="ts">
-// import { useRoute } from "vue-router";
 import hereWego from "../../assets/img/hereWeGo.png";
 import InputForm from "../../component/library/input/index.vue";
 import DatePicker from "../../component/library/DatePicker/index.vue";
 import inputArea from "../../component/library/inputArea/index.vue";
-import selectForm from "../../component/library/selectNebula/index.vue";
 import InputImage from "../../component/library/InputImage/index.vue";
 import { useTeamStore } from "../../store/team";
 import { useImportStore } from "../../store/import";
@@ -204,27 +195,16 @@ export default defineComponent({
     InputForm,
     DatePicker,
     inputArea,
-    selectForm,
     InputImage,
   },
   setup() {
-    onMounted(() => {});
     const TeamStore = useTeamStore();
-    const statusMatch = [
-      {
-        id: 1,
-        name: "Loại trực tiếp",
-      },
-      {
-        id: 2,
-        name: "Vòng bảng",
-      },
-    ];
     const toast = useToast();
     const ImportStore = useImportStore();
     const formData = new FormData();
+    
     const logoId: Ref<number> = ref(0);
-    const name: Ref<string> = ref("Tên đội bóng");
+    const name: Ref<string> = ref("");
     const username: Ref<string> = ref("");
     const date: Ref<number | undefined> = ref();
     const nameCoach: Ref<string> = ref("");
@@ -232,9 +212,90 @@ export default defineComponent({
     const cccd: Ref<string> = ref("");
     const birthdate: Ref<string> = ref("");
     const description: Ref<string> = ref("");
+    const isSubmitting = ref(false);
+    const windowWidth = ref(0);
+
+    // Computed property để hiển thị tên đội real-time
+    const displayName = computed(() => {
+      return name.value.trim() || 'Tên đội bóng';
+    });
+
+    // Generate years from current year back to 1900
+    const currentYear = new Date().getFullYear();
+    const years = computed(() => {
+      const yearList = [];
+      for (let year = currentYear; year >= 1900; year--) {
+        yearList.push(year);
+      }
+      return yearList;
+    });
+
+    // List of countries
+    const countries = [
+      'Việt Nam',
+      'Thái Lan',
+      'Indonesia',
+      'Malaysia',
+      'Singapore',
+      'Philippines',
+      'Myanmar',
+      'Campuchia',
+      'Lào',
+      'Brunei',
+      'Hàn Quốc',
+      'Nhật Bản',
+      'Trung Quốc',
+      'Đài Loan',
+      'Úc',
+      'New Zealand',
+      'Ấn Độ',
+      'Pakistan',
+      'Bangladesh',
+      'Sri Lanka',
+      'Anh',
+      'Đức',
+      'Pháp',
+      'Tây Ban Nha',
+      'Ý',
+      'Hà Lan',
+      'Bồ Đào Nha',
+      'Bỉ',
+      'Thụy Sĩ',
+      'Áo',
+      'Ba Lan',
+      'Séc',
+      'Hungary',
+      'Romania',
+      'Nga',
+      'Mỹ',
+      'Canada',
+      'Mexico',
+      'Brazil',
+      'Argentina',
+      'Uruguay',
+      'Chile',
+      'Colombia',
+      'Peru',
+      'Venezuela',
+      'Nam Phi',
+      'Nigeria',
+      'Ai Cập',
+      'Morocco',
+      'Ghana',
+      'Khác',
+    ];
+
+    onMounted(() => {
+      windowWidth.value = window.innerWidth;
+      window.addEventListener('resize', () => {
+        windowWidth.value = window.innerWidth;
+      });
+    });
+
     const handleImage = (file: File) => {
       formData.append("file", file);
     };
+
     const fnAddImg = () => {
       const params = new URLSearchParams({
         imageType: "4",
@@ -243,10 +304,21 @@ export default defineComponent({
         params.append("imageId", logoId.value.toString());
       }
       const url = `?${params.toString()}`;
-
       ImportStore.fnAddImportLogoTeam(url, formData);
     };
+
     const handelTeamadd = () => {
+      // Validation
+      if (!name.value.trim()) {
+        toast.error({
+          message: "Vui lòng nhập tên đội bóng",
+          position: "topRight",
+        });
+        return;
+      }
+
+      isSubmitting.value = true;
+
       const payload = {
         name: name.value,
         logoUrl: "mandan/img",
@@ -263,6 +335,7 @@ export default defineComponent({
         tournaments: [],
         players: [],
       };
+
       TeamStore.fnAddTeam(payload)
         .then((res: any) => {
           if (res.teamId) {
@@ -270,20 +343,23 @@ export default defineComponent({
             fnAddImg();
             fnReset();
             toast.success({
-              title: "Success!",
-              message: "thêm đội bóng thành công",
+              message: "Tạo đội bóng thành công!",
               position: "topRight",
             });
           }
         })
         .catch((err) => {
+          console.error('Add team error:', err);
           toast.error({
-            title: "Error!",
-            message: "thêm đội bóng thất bại",
+            message: err?.message || "Tạo đội bóng thất bại. Vui lòng thử lại!",
             position: "topRight",
           });
+        })
+        .finally(() => {
+          isSubmitting.value = false;
         });
     };
+
     const fnReset = () => {
       name.value = "";
       username.value = "";
@@ -294,9 +370,9 @@ export default defineComponent({
       birthdate.value = "";
       nationality.value = "";
     };
+
     return {
       hereWego,
-      statusMatch,
       name,
       username,
       date,
@@ -307,61 +383,89 @@ export default defineComponent({
       nameCoach,
       handleImage,
       handelTeamadd,
+      fnReset,
+      isSubmitting,
+      years,
+      countries,
+      windowWidth,
+      displayName,
     };
   },
 });
-// const route = useRoute();
 </script>
 
 <style scoped>
-.inputBackground {
-  background-color: rgba(250, 249, 249, 1);
-  height: 50px;
-  align-items: center;
-  border-radius: 15px;
-  padding-left: 20px;
-  outline: none;
+.hero-banner {
+  position: relative;
 }
-.background-taodoibong {
-  background: rgba(255, 255, 255, 1);
+
+.logo-section {
+  z-index: 10;
 }
-.text-header::after {
-  content: "";
-  display: block;
-  background: linear-gradient(
-    to right,
-    var(--textsport) 20.69%,
-    var(--textsport2) 58.36%
-  );
-  height: 1px;
-  width: 0;
-  transition: all 0.3s ease;
+
+.form-container {
+  animation: slideUp 0.3s ease-out;
 }
-.text-header:hover::after {
-  width: 100%;
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.text-gradient:hover {
-  background: linear-gradient(
-    to right,
-    var(--textsport) 20.69%,
-    var(--textsport2) 58.36%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+
+/* Enhanced dropdown styling */
+.dropdown-select {
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
-.text-gradient2 {
-  background: linear-gradient(
-    to right,
-    var(--textsport) 20.69%,
-    var(--textsport2) 58.36%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+
+.dropdown-select:hover {
+  border-color: #fb923c;
+  box-shadow: 0 2px 6px rgba(251, 146, 60, 0.15);
 }
-.logoTeam {
-  position: absolute;
-  left: 20px;
-  right: 0;
-  bottom: 20px;
+
+.dropdown-select:focus {
+  box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.1);
+}
+
+/* Custom scrollbar for dropdowns */
+.dropdown-select {
+  scrollbar-width: thin;
+  scrollbar-color: #f97316 #f1f1f1;
+}
+
+.dropdown-select::-webkit-scrollbar {
+  width: 10px;
+}
+
+.dropdown-select::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.dropdown-select::-webkit-scrollbar-thumb {
+  background: #f97316;
+  border-radius: 10px;
+  border: 2px solid #f1f1f1;
+}
+
+.dropdown-select::-webkit-scrollbar-thumb:hover {
+  background: #ea580c;
+}
+
+/* Option styling */
+.dropdown-select option {
+  padding: 12px;
+  font-weight: 500;
+}
+
+.dropdown-select option:checked {
+  background: linear-gradient(90deg, #f97316 0%, #ec4899 100%);
+  color: white;
 }
 </style>

@@ -177,7 +177,7 @@ const viewPlayers = async (team: any) => {
     console.warn("Team id not found", team);
     return;
   }
-  const path = `/tournaments/${tournamentId}/teams/${id}/players`;
+  const path = `/api/tournaments/${tournamentId}/teams/${id}/players`;
 
   if (navigating.value) return;
   navigating.value = true;

@@ -26,33 +26,40 @@ export const headerLeague = [
     router: "danhsachdoibong",
   },
 ];
+
 export const headerDoibong = [
   {
     id: 1,
     title: "Danh sách thành viên",
     router: "danhsach",
+    icon: "mdi:account-group",
   },
   {
     id: 2,
     title: "Lịch thi đấu",
     router: "lichthidau",
+    icon: "mdi:calendar-clock",
   },
   {
     id: 3,
     title: "Đội hình",
     router: "doihinh",
+    icon: "mdi:soccer-field",
   },
   {
     id: 4,
     title: "Quỹ đội",
     router: "quydoi",
+    icon: "mdi:cash-multiple",
   },
   {
-    id: 4,
+    id: 5,
     title: "Rời đội",
     router: "roidoi",
+    icon: "mdi:exit-run",
   },
 ];
+
 export const statusMatch = [
   {
     id: 1,

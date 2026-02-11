@@ -5,50 +5,45 @@
     </div>
     
     <div v-else>
-      <div class="flex justify-end mt-[28px] mb-[28px] gap-4">
+      <!-- Buttons section - Responsive -->
+      <div class="flex flex-col md:flex-row md:justify-end mt-[28px] mb-[28px] gap-3 md:gap-4">
         <div
-          style="
-            width: 213px;
-            height: 50px;
-            border: 1px solid rgba(4, 184, 10, 1);
-            color: rgba(4, 184, 10, 1);
-            border-radius: 10px;
-          "
-          class="flex justify-center items-center font-medium text-[20px] cursor-pointer"
+          class="w-full md:w-[213px] h-[50px] border border-[rgba(4,184,10,1)] text-[rgba(4,184,10,1)] rounded-[10px] flex justify-center items-center font-medium text-[16px] md:text-[20px] cursor-pointer hover:bg-[rgba(4,184,10,0.05)] transition-colors"
           @click="openManualMatch = true"
         >
           Tạo trận thủ công
         </div>
         <div
-          style="
-            width: 213px;
-            height: 50px;
-            border: 1px solid rgba(4, 184, 10, 1);
-            color: rgba(4, 184, 10, 1);
-            border-radius: 10px;
-          "
-          class="flex justify-center items-center font-medium text-[20px] cursor-pointer"
+          class="w-full md:w-[213px] h-[50px] border border-[rgba(4,184,10,1)] text-[rgba(4,184,10,1)] rounded-[10px] flex justify-center items-center font-medium text-[16px] md:text-[20px] cursor-pointer hover:bg-[rgba(4,184,10,0.05)] transition-colors"
           @click="openTeamTournament = true"
         >
           Chia bảng đấu
         </div>
         <div
-          style="
-            width: 213px;
-            height: 50px;
-            border: 1px solid rgba(4, 184, 10, 1);
-            color: rgba(4, 184, 10, 1);
-            border-radius: 10px;
-          "
-          class="flex justify-center items-center font-medium text-[20px] cursor-pointer"
+          class="w-full md:w-[213px] h-[50px] border border-[rgba(4,184,10,1)] text-[rgba(4,184,10,1)] rounded-[10px] flex justify-center items-center font-medium text-[16px] md:text-[20px] cursor-pointer hover:bg-[rgba(4,184,10,0.05)] transition-colors"
           @click="openTeambatchTournament = true"
         >
           Thêm nhiều đội bóng
         </div>
       </div>
       
+      <!-- Empty state when no teams -->
+      <div v-if="!listTeam || listTeam.length === 0" class="flex flex-col items-center justify-center py-20 text-center">
+        <div class="mb-4">
+          <Icon name="mdi:football" class="text-gray-300" width="80" height="80" />
+        </div>
+        <h3 class="text-xl font-medium text-gray-600 mb-2">Chưa có đội bóng nào</h3>
+        <p class="text-gray-500 mb-6">Hãy thêm đội bóng để bắt đầu giải đấu</p>
+        <button
+          @click="openTeambatchTournament = true"
+          class="px-6 py-3 bg-[rgba(4,184,10,1)] text-white rounded-lg hover:bg-[rgba(4,184,10,0.9)] transition-colors font-medium"
+        >
+          Thêm đội bóng ngay
+        </button>
+      </div>
+      
       <!-- Grid responsive giống trang đội bóng -->
-      <div style="margin-top: 50px" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 place-items-center">
+      <div v-else style="margin-top: 50px" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 place-items-center">
         <div
           v-for="(item, index) in listTeam"
           :key="index"
@@ -57,7 +52,7 @@
           <div class="cardAbsolute relative flex flex-col justify-between items-center p-[16px]">
             <div class="absolute top-[20px] left-[14px]">
               <Icon
-                class="w-[24px] h-[24px]"
+                class="w-[24px] h-[24px] cursor-pointer hover:scale-110 transition-transform"
                 name="hugeicons:delete-02"
                 style="color: #eb0428"
                 @click="handleDellete(item)"
@@ -97,7 +92,8 @@
         </div>
       </div>
       
-      <div class="flex justify-center mt-[40px] mb-[40px]">
+      <!-- Pagination - Only show if there are teams -->
+      <div v-if="listTeam && listTeam.length > 0" class="flex justify-center mt-[40px] mb-[40px]">
         <div class="flex justify-between gap-4 items-center">
           <div
             class="flex items-center justify-center w-[50px] h-[50px] rounded-full cursor-pointer"

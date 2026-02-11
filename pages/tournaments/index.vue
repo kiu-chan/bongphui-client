@@ -207,7 +207,7 @@ export default defineComponent({
 
     const viewTeams = (id?: number | string) => {
       if (!id) return;
-      router.push(`/tournaments/${id}/teams`).catch(() => {});
+      router.push(`/api/tournaments/${id}/teams`).catch(() => {});
     };
 
     const formatDate = (d?: string) => {

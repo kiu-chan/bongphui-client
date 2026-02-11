@@ -21,8 +21,8 @@
         </div>
       </div>
 
-      <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div v-for="n in 6" :key="n" class="animate-pulse bg-white rounded-lg shadow-sm p-4 h-40"></div>
+      <div v-if="loading" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 place-items-center">
+        <div v-for="n in 6" :key="n" class="animate-pulse cardGiaidau w-full"></div>
       </div>
 
       <div v-else>
@@ -30,17 +30,45 @@
           Không tìm thấy giải đấu.
         </div>
 
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div v-for="t in tournamentsFiltered" :key="t.id" class="bg-white rounded-lg shadow hover:shadow-lg transition p-4">
-            <img :src="t.imageUrl || defaultLogo" alt="Logo giải đấu" class="w-full h-40 object-cover rounded mb-3" />
-            <h3 class="font-bold text-lg text-gray-800 mb-1">{{ t.name }}</h3>
-            <p class="text-sm text-gray-600 mb-2">{{ t.location || "Chưa có địa điểm" }}</p>
-            <div class="text-xs text-gray-500 mb-3">
-              {{ formatDate(t.startDate) }} - {{ formatDate(t.endDate) }}
-            </div>
-            <button @click="viewTeams(t.id)" class="w-full py-2 bg-orange-500 text-white rounded hover:bg-orange-600">
-              Xem đội
-            </button>
+        <div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 place-items-center">
+          <div
+            v-for="(item, index) in tournamentsFiltered"
+            :key="index"
+            class="cardGiaidau w-full"
+          >
+            <NuxtLink :to="`/quanlygiaidau/${item.id}/danhsachdoibong`">
+              <div class="cardAbsolute flex flex-col justify-between items-center p-[16px]">
+                <div class="max-w-[110px] h-[130px]">
+                  <img
+                    class="w-full h-full object-contain"
+                    :src="item?.imageUrl || '/img/imglg.png'"
+                    alt=""
+                    @error="$event.target.src = '/img/imglg.png'"
+                  />
+                </div>
+                <div
+                  :style="[
+                    activeIndex === index
+                      ? 'color :rgba(244, 134, 55, 1)'
+                      : 'color :rgba(0, 0, 0, 1)',
+                  ]"
+                  class="text-center"
+                >
+                  <h2
+                    style="width: 160px"
+                    class="font-medium text-[18px] mx-auto"
+                  >
+                    {{ item.name }}
+                  </h2>
+                </div>
+                <div
+                  style="color: rgba(255, 255, 255, 1);background: linear-gradient(90deg,#ec7748 0%,#a545d6 100%)"
+                  class="w-[138px] h-[40px] rounded-[5px] flex justify-center items-center font-normal text-[16px]"
+                >
+                  Xem chi tiết
+                </div>
+              </div>
+            </NuxtLink>
           </div>
         </div>
       </div>
@@ -62,6 +90,7 @@ export default defineComponent({
     const loading = ref(false);
     const keyword = ref("");
     const defaultLogo = "/img/imglg.png";
+    const activeIndex = ref<number | null>(null);
 
     const fetchList = async () => {
       loading.value = true;
@@ -86,7 +115,7 @@ export default defineComponent({
 
     const viewTeams = (id?: number | string) => {
       if (!id) return;
-      router.push(`/tournaments/${id}/teams`).catch(() => {});
+      router.push(`/api/tournaments/${id}/teams`).catch(() => {});
     };
 
     const formatDate = (d?: string) => {
@@ -115,6 +144,7 @@ export default defineComponent({
       loading,
       keyword,
       defaultLogo,
+      activeIndex,
       onSearch,
       viewTeams,
       formatDate,
@@ -133,5 +163,47 @@ export default defineComponent({
   background: white;
   border-radius: 1rem;
   margin-top: -6rem;
+}
+
+/* Thu nhỏ card để 5 cái vừa hàng */
+.cardGiaidau {
+  position: relative;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #b0aeac 0%, #b1aeac 100%);
+  clip-path: polygon(0 0, 84% 0, 100% 17%, 100% 100%, 17% 100%, 0 84%);
+  height: 340px; /* giảm chiều cao */
+  width: 100%;
+  padding: 2px; /* tạo khoảng viền */
+  box-sizing: border-box;
+}
+
+.cardGiaidau:hover{
+  background: linear-gradient(
+    180deg,
+    #f17a3c 0%,
+    #131b77 100%
+  ); /* border gradient */
+}
+
+.cardAbsolute {
+  width: 100%;
+  height: 100%;
+  border-radius: 18px; /* nhỏ hơn border-radius ngoài 1 chút */
+  background: linear-gradient(180deg, #fffefe 0%, #eeeae8 100%);
+  clip-path: polygon(0 0, 84% 0, 100% 17%, 100% 100%, 17% 100%, 0 84%);
+}
+
+.cardAbsolute:hover {
+  background: linear-gradient(180deg, #fffefe 0%, #ffd7c3 100%);
+}
+
+.buttonChitiet:hover{
+  color :rgba(244, 134, 55, 1)
+}
+
+@media (min-width: 1600px) {
+  .listCardGiaiDau {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
 }
 </style>

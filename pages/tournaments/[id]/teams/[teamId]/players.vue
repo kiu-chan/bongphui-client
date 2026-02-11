@@ -255,7 +255,7 @@ function extractArray(payload: any): any[] {
 
 async function fetchTeamPlayers(tid: number | string) {
   try {
-    const res = await $api.get(`/players/by-team/${tid}`);
+    const res = await $api.get(`/api/players/by-team/${tid}`);
     responseRaw.value = responseRaw.value ?? {};
     responseRaw.value.teamPlayers = res;
     teamPlayers.value = extractArray(res);
@@ -266,7 +266,7 @@ async function fetchTeamPlayers(tid: number | string) {
 
 async function fetchTournamentMembers(tourId: number | string, tid: number | string) {
   try {
-    const res = await $api.get(`/tournaments/${tourId}/teams/${tid}/members`);
+    const res = await $api.get(`/api/tournaments/${tourId}/teams/${tid}/members`);
     responseRaw.value = responseRaw.value ?? {};
     responseRaw.value.tournamentMembers = res;
     tournamentMembers.value = extractArray(res);
@@ -460,7 +460,7 @@ async function addMember(player: any) {
   };
 
   try {
-    await $api.post(`/tournaments/${tournamentId}/teams/${teamId}/members`, payload);
+    await $api.post(`/api/tournaments/${tournamentId}/teams/${teamId}/members`, payload);
     await fetchAll();
     toast?.success?.({ message: 'Thêm thành viên vào đội trong giải đấu thành công', position: 'topRight' });
   } catch (e: any) {
@@ -479,7 +479,7 @@ async function removeMember(player: any) {
   if (removingIds.value.has(key)) return;
   removingIds.value.add(key);
   try {
-    await $api.delete(`/tournaments/${tournamentId}/teams/${teamId}/members/${playerId}`);
+    await $api.delete(`/api/tournaments/${tournamentId}/teams/${teamId}/members/${playerId}`);
     await fetchAll();
     toast?.success?.({ message: 'Xóa thành viên khỏi đội trong giải đấu thành công', position: 'topRight' });
   } catch (e: any) {
@@ -510,7 +510,7 @@ async function addAllTeamMembers() {
       shirt_number: p.shirt_number ?? p.shirtNumber,
     };
     try {
-      await $api.post(`/tournaments/${tournamentId}/teams/${teamId}/members`, payload);
+      await $api.post(`/api/tournaments/${tournamentId}/teams/${teamId}/members`, payload);
       added.push(String(key));
     } catch (e) {
       failed.push(String(key));
@@ -547,7 +547,7 @@ async function addManualMember() {
     shirt_number: manualForm.value.shirt_number ?? undefined,
   };
   try {
-    await $api.post(`/tournaments/${tournamentId}/teams/${teamId}/members`, payload);
+    await $api.post(`/api/tournaments/${tournamentId}/teams/${teamId}/members`, payload);
     toast?.success?.({ message: 'Thêm thành viên vào đội trong giải đấu thành công', position: 'topRight' });
     manualModalOpen.value = false;
     await fetchAll();

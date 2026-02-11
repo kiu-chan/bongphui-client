@@ -1,186 +1,255 @@
 <template>
-  <main class="players-page min-h-screen w-full overflow-x-hidden">
-    <!-- Reduced-height hero background so top gap is smaller -->
-    <section class="page-hero" />
-
-    <!-- Content panel overlapping the hero (white panel so text/buttons are clearly readable) -->
-    <section class="page-content mx-auto">
-      <div class="header flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        <div>
-          <button @click="goBack" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border hover:bg-gray-50 bg-white">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-            Quay lại
+  <main class="players-page min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-orange-50 via-purple-50 to-blue-50">
+    <!-- Hero Header -->
+    <section class="page-hero">
+      <div class="hero-content">
+        <div class="container mx-auto px-4">
+          <button @click="goBack" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all mb-4 border border-white/20">
+            <Icon name="mdi:arrow-left" class="text-[20px]" />
+            <span class="font-medium">Quay lại</span>
           </button>
-
-          <h1 class="title text-2xl lg:text-3xl font-semibold text-gray-900 mt-3">Danh sách thành viên</h1>
-          <p class="text-sm text-gray-600 mt-1">
-            Giải: <span class="font-medium">{{ tournamentId }}</span> — Đội: <span class="font-medium">{{ teamId }}</span>
+          
+          <h1 class="text-3xl md:text-4xl font-bold text-white mb-3">
+            Danh sách thành viên
+          </h1>
+          <p class="text-white/90 text-lg">
+            <span class="font-semibold">Giải đấu:</span> {{ tournamentId }} • <span class="font-semibold">Đội:</span> {{ teamId }}
           </p>
-        </div>
-
-        <div class="controls flex items-center gap-3">
-          <input
-            v-model="q"
-            @input="onFilter"
-            type="search"
-            placeholder="Tìm thành viên theo tên / CCCD / số áo..."
-            class="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 bg-white"
-          />
-          <select v-model="statusFilter" class="px-3 py-2 border rounded-md text-sm bg-white">
-            <option value="">Tất cả trạng thái</option>
-            <option value="raSan">Được ra sân</option>
-            <option value="tuDo">Thành viên tự do</option>
-            <option value="khongDK">Không đăng ký</option>
-          </select>
-          <button @click="refresh" class="px-3 py-2 bg-white border rounded-md text-sm hover:bg-gray-50">Làm mới</button>
-
-          <!-- Manual add button (+) - round and visually prominent -->
-          <button
-            @click="openManualModal"
-            title="Thêm thành viên thủ công"
-            class="ml-2 inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg"
-          >
-            <span class="text-2xl leading-none font-bold">+</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Banner: show when tournament members endpoint returns 500 -> interpret as "no members registered" -->
-      <div v-if="noMembersInTournament" class="banner mb-6 p-4 rounded border-l-4 border-red-400 bg-red-50 text-red-800 flex items-center justify-between gap-4">
-        <div>
-          <div class="font-semibold">Đội chưa có thành viên được đăng ký ra sân trong giải</div>
-          <div class="text-sm mt-1">Nếu không thêm thành viên vào danh sách thi đấu, đội có thể bị loại khỏi giải đấu.</div>
-        </div>
-        <div class="flex items-center gap-3">
-          <button @click="onAddAllConfirm" :disabled="addingAll" class="px-4 py-2 bg-orange-500 text-white rounded-md">
-            <span v-if="addingAll">Đang thêm...</span>
-            <span v-else>Thêm tất cả thành viên đội vào giải</span>
-          </button>
-          <button @click="refresh" class="px-3 py-2 border rounded-md bg-white">Làm mới</button>
-        </div>
-      </div>
-
-      <div v-if="error && !noMembersInTournament" class="mb-4 p-3 bg-red-50 text-red-700 rounded">
-        Lỗi khi lấy dữ liệu: {{ error }}
-      </div>
-
-      <div v-if="loading" class="loading py-12 text-center">
-        <div class="spinner inline-block w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <div class="text-gray-600">Đang tải danh sách thành viên...</div>
-      </div>
-
-      <!-- Debug snippet to assist troubleshooting when combined list is empty -->
-      <div v-if="!loading && membersCombined.length === 0 && responseRaw" class="mb-6 p-3 bg-yellow-50 text-yellow-800 rounded">
-        <div class="font-medium mb-2">Debug: response từ API (first 1k chars)</div>
-        <pre class="max-h-40 overflow-auto text-xs">{{ debugSnippet }}</pre>
-      </div>
-
-      <div v-else>
-        <div v-if="membersFiltered.length === 0" class="text-center py-12 text-gray-500">
-          Không tìm thấy thành viên.
-        </div>
-
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <article
-            v-for="p in membersFiltered"
-            :key="idKey(p)"
-            class="card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
-          >
-            <div class="p-4 flex gap-4 items-center">
-              <div class="avatar w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
-                <svg v-if="!hasAvatar(p)" class="w-8 h-8 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M5.121 17.804A13.937 13.937 0 0112 15c2.72 0 5.24.75 7.379 2.034M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-                <img v-else :src="p.avatar" @error="$event.target.style.display = 'none'" :alt="p.name" class="w-full h-full object-cover"/>
-              </div>
-
-              <div class="flex-1 min-w-0">
-                <div class="flex items-start justify-between gap-3">
-                  <div>
-                    <h3 class="font-semibold text-lg text-gray-800 truncate">{{ p.name }}</h3>
-                    <p class="text-sm text-gray-500 mt-1 truncate">{{ p.cccd || 'CCCD chưa có' }}</p>
-                  </div>
-
-                  <div class="text-right">
-                    <div class="text-sm text-gray-500">#{{ p.shirt_number ?? p.shirtNumber ?? '-' }}</div>
-                    <div class="text-xs text-gray-400 mt-1">{{ p.phoneNumber || '—' }}</div>
-                  </div>
-                </div>
-
-                <div class="mt-3 flex items-center gap-2 flex-wrap">
-                  <span class="px-2 py-0.5 bg-gray-100 rounded text-gray-600">ID: {{ p.id ?? p.playerId ?? '-' }}</span>
-                  <span v-if="p.status === 'raSan'" class="px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Được ra sân</span>
-                  <span v-else-if="p.status === 'tuDo'" class="px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">Thành viên tự do</span>
-                  <span v-else class="px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">Không đăng ký</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="p-3 border-t bg-gray-50 flex items-center justify-between">
-              <!-- Removed the "Nguồn" line as requested -->
-              <div></div>
-
-              <div class="flex items-center gap-2">
-                <button @click="openPlayer(p)" class="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Xem</button>
-
-                <button
-                  v-if="p.status !== 'raSan'"
-                  :disabled="addingIds.has(idKey(p))"
-                  @click="addMember(p)"
-                  class="px-3 py-1 text-sm border rounded-md"
-                  :class="addingIds.has(idKey(p)) ? 'bg-gray-200 text-gray-600' : 'bg-white hover:bg-gray-50'"
-                >
-                  <span v-if="addingIds.has(idKey(p))">Đang thêm...</span>
-                  <span v-else>Thêm vào giải</span>
-                </button>
-
-                <button
-                  v-if="p.status === 'raSan'"
-                  :disabled="removingIds.has(idKey(p))"
-                  @click="removeMember(p)"
-                  class="px-3 py-1 text-sm border rounded-md bg-white hover:bg-gray-50"
-                >
-                  <span v-if="removingIds.has(idKey(p))">Đang xóa...</span>
-                  <span v-else>Xóa khỏi danh sách</span>
-                </button>
-              </div>
-            </div>
-          </article>
         </div>
       </div>
     </section>
 
-    <!-- Manual add modal -->
-    <div v-if="manualModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div class="bg-white rounded-lg max-w-lg w-full p-6">
-        <h3 class="font-semibold text-lg mb-4">Thêm thành viên thủ công</h3>
-        <div class="space-y-3">
-          <div>
-            <label class="block text-sm text-gray-600 mb-1">Tên</label>
-            <input v-model="manualForm.name" class="w-full px-3 py-2 border rounded" />
+    <!-- Content -->
+    <section class="page-content container mx-auto px-4">
+      <!-- Controls Bar -->
+      <div class="controls-bar bg-white rounded-xl shadow-lg p-4 md:p-6 mb-6 border border-gray-100">
+        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+          <div class="flex-1 w-full md:w-auto">
+            <div class="relative">
+              <Icon name="mdi:magnify" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[20px]" />
+              <input
+                v-model="q"
+                @input="onFilter"
+                type="search"
+                placeholder="Tìm thành viên theo tên, CCCD, số áo..."
+                class="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white transition-all"
+              />
+            </div>
           </div>
-          <div>
-            <label class="block text-sm text-gray-600 mb-1">CCCD</label>
-            <input v-model="manualForm.cccd" class="w-full px-3 py-2 border rounded" />
+
+          <div class="flex items-center gap-3 w-full md:w-auto">
+            <select v-model="statusFilter" class="px-4 py-2.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all">
+              <option value="">Tất cả trạng thái</option>
+              <option value="raSan">Được ra sân</option>
+              <option value="tuDo">Thành viên tự do</option>
+              <option value="khongDK">Không đăng ký</option>
+            </select>
+
+            <button @click="refresh" class="px-4 py-2.5 bg-white border-2 border-gray-200 rounded-lg text-sm hover:bg-gray-50 font-medium transition-all">
+              <Icon name="mdi:refresh" class="text-[18px]" />
+            </button>
+
+            <button
+              @click="openManualModal"
+              title="Thêm thành viên thủ công"
+              class="inline-flex items-center justify-center w-11 h-11 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 text-white hover:shadow-lg hover:scale-110 transition-all shadow-md"
+            >
+              <Icon name="mdi:plus" class="text-[24px]" />
+            </button>
           </div>
-          <div>
-            <label class="block text-sm text-gray-600 mb-1">SĐT</label>
-            <input v-model="manualForm.phoneNumber" class="w-full px-3 py-2 border rounded" />
+        </div>
+      </div>
+
+      <!-- Warning Banner -->
+      <div v-if="noMembersInTournament" class="warning-banner mb-6 p-5 rounded-xl border-l-4 border-orange-500 bg-orange-50 shadow-md">
+        <div class="flex items-start gap-4">
+          <div class="flex-shrink-0">
+            <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
+              <Icon name="mdi:alert" class="text-white text-[24px]" />
+            </div>
           </div>
+          <div class="flex-1">
+            <h3 class="font-bold text-orange-900 text-lg mb-1">Đội chưa có thành viên được đăng ký ra sân</h3>
+            <p class="text-orange-800 mb-4">Nếu không thêm thành viên vào danh sách thi đấu, đội có thể bị loại khỏi giải đấu.</p>
+            <div class="flex items-center gap-3">
+              <button @click="onAddAllConfirm" :disabled="addingAll" class="px-5 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-semibold transition-all shadow-md disabled:opacity-50">
+                <span v-if="addingAll">
+                  <Icon name="mdi:loading" class="animate-spin inline" /> Đang thêm...
+                </span>
+                <span v-else>Thêm tất cả thành viên vào giải</span>
+              </button>
+              <button @click="refresh" class="px-4 py-2.5 border-2 border-orange-300 rounded-lg bg-white hover:bg-orange-50 font-semibold text-orange-700 transition-all">
+                Làm mới
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div v-if="error && !noMembersInTournament" class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg shadow-md flex items-center gap-3">
+        <Icon name="mdi:alert-circle" class="text-[24px] flex-shrink-0" />
+        <div>
+          <p class="font-semibold">Lỗi khi lấy dữ liệu</p>
+          <p class="text-sm">{{ error }}</p>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div v-if="loading" class="loading py-20 text-center">
+        <div class="inline-block w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-gray-600 font-medium">Đang tải danh sách thành viên...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div v-else-if="!loading && membersFiltered.length === 0" class="empty-state py-20 text-center">
+        <Icon name="mdi:account-search" class="text-gray-300 mx-auto mb-4" width="80" height="80" />
+        <h3 class="text-xl font-semibold text-gray-600 mb-2">Không tìm thấy thành viên</h3>
+        <p class="text-gray-500">Hãy thử điều chỉnh bộ lọc hoặc thêm thành viên mới</p>
+      </div>
+
+      <!-- Members Grid -->
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <article
+          v-for="p in membersFiltered"
+          :key="idKey(p)"
+          class="member-card bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
+        >
+          <!-- Card Header -->
+          <div class="p-5 bg-gradient-to-r from-orange-50 to-pink-50">
+            <div class="flex gap-4 items-center">
+              <div class="avatar-wrapper flex-shrink-0">
+                <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-md border-2 border-white">
+                  <Icon v-if="!hasAvatar(p)" name="mdi:account" class="text-gray-400 text-[32px]" />
+                  <img v-else :src="p.avatar" @error="$event.target.style.display = 'none'" :alt="p.name" class="w-full h-full object-cover"/>
+                </div>
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <h3 class="font-bold text-lg text-gray-900 truncate mb-1">{{ p.name }}</h3>
+                <div class="flex items-center gap-2 text-sm text-gray-600">
+                  <Icon name="mdi:card-account-details" class="text-[16px]" />
+                  <span class="truncate">{{ p.cccd || 'Chưa có CCCD' }}</span>
+                </div>
+              </div>
+
+              <div class="text-right flex-shrink-0">
+                <div class="text-2xl font-bold text-orange-600">#{{ p.shirt_number ?? p.shirtNumber ?? '-' }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Body -->
+          <div class="p-5">
+            <div class="space-y-3">
+              <div class="flex items-center gap-2 text-sm text-gray-600">
+                <Icon name="mdi:phone" class="text-[16px]" />
+                <span>{{ p.phoneNumber || 'Chưa có SĐT' }}</span>
+              </div>
+
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="px-3 py-1 bg-gray-100 rounded-full text-xs font-medium text-gray-700">
+                  ID: {{ p.id ?? p.playerId ?? '-' }}
+                </span>
+                <span v-if="p.status === 'raSan'" class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 flex items-center gap-1">
+                  <Icon name="mdi:check-circle" class="text-[14px]" />
+                  Được ra sân
+                </span>
+                <span v-else-if="p.status === 'tuDo'" class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 flex items-center gap-1">
+                  <Icon name="mdi:account-clock" class="text-[14px]" />
+                  Tự do
+                </span>
+                <span v-else class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 flex items-center gap-1">
+                  <Icon name="mdi:close-circle" class="text-[14px]" />
+                  Chưa đăng ký
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Footer -->
+          <div class="p-4 bg-gray-50 border-t flex items-center justify-end gap-2">
+            <button @click="openPlayer(p)" class="px-4 py-2 text-sm bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:shadow-md transition-all font-medium">
+              <Icon name="mdi:eye" class="inline text-[16px]" /> Xem
+            </button>
+
+            <button
+              v-if="p.status !== 'raSan'"
+              :disabled="addingIds.has(idKey(p))"
+              @click="addMember(p)"
+              class="px-4 py-2 text-sm border-2 rounded-lg font-medium transition-all"
+              :class="addingIds.has(idKey(p)) ? 'bg-gray-200 text-gray-600 border-gray-300' : 'bg-white hover:bg-orange-50 border-orange-500 text-orange-600'"
+            >
+              <Icon v-if="addingIds.has(idKey(p))" name="mdi:loading" class="animate-spin inline" />
+              <Icon v-else name="mdi:plus-circle" class="inline" />
+              {{ addingIds.has(idKey(p)) ? 'Đang thêm...' : 'Thêm vào giải' }}
+            </button>
+
+            <button
+              v-if="p.status === 'raSan'"
+              :disabled="removingIds.has(idKey(p))"
+              @click="removeMember(p)"
+              class="px-4 py-2 text-sm border-2 border-red-500 rounded-lg bg-white hover:bg-red-50 text-red-600 font-medium transition-all"
+            >
+              <Icon v-if="removingIds.has(idKey(p))" name="mdi:loading" class="animate-spin inline" />
+              <Icon v-else name="mdi:delete" class="inline" />
+              {{ removingIds.has(idKey(p)) ? 'Đang xóa...' : 'Xóa' }}
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Manual Add Modal -->
+    <div v-if="manualModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+      <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl">
+        <!-- Modal Header -->
+        <div class="p-6 border-b bg-gradient-to-r from-orange-500 to-pink-500 rounded-t-2xl">
+          <h3 class="font-bold text-xl text-white flex items-center gap-2">
+            <Icon name="mdi:account-plus" class="text-[24px]" />
+            Thêm thành viên thủ công
+          </h3>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6 space-y-4">
           <div>
-            <label class="block text-sm text-gray-600 mb-1">Số áo</label>
-            <input v-model.number="manualForm.shirt_number" type="number" class="w-full px-3 py-2 border rounded" />
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <Icon name="mdi:account" class="inline text-[16px]" /> Tên <span class="text-red-500">*</span>
+            </label>
+            <input v-model="manualForm.name" class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="Nguyễn Văn A" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <Icon name="mdi:card-account-details" class="inline text-[16px]" /> CCCD <span class="text-red-500">*</span>
+            </label>
+            <input v-model="manualForm.cccd" class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="001234567890" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <Icon name="mdi:phone" class="inline text-[16px]" /> Số điện thoại
+            </label>
+            <input v-model="manualForm.phoneNumber" class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="0912345678" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <Icon name="mdi:tshirt-crew" class="inline text-[16px]" /> Số áo
+            </label>
+            <input v-model.number="manualForm.shirt_number" type="number" class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="10" />
           </div>
         </div>
 
-        <div class="mt-4 flex justify-end gap-3">
-          <button @click="closeManualModal" class="px-4 py-2 border rounded">Hủy</button>
-          <button @click="addManualMember" :disabled="manualAdding" class="px-4 py-2 bg-green-500 text-white rounded">
-            <span v-if="manualAdding">Đang thêm...</span>
-            <span v-else>Thêm</span>
+        <!-- Modal Footer -->
+        <div class="p-6 bg-gray-50 border-t rounded-b-2xl flex justify-end gap-3">
+          <button @click="closeManualModal" class="px-5 py-2.5 border-2 border-gray-300 rounded-lg font-semibold hover:bg-gray-100 transition-all">
+            Hủy
+          </button>
+          <button @click="addManualMember" :disabled="manualAdding" class="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50">
+            <Icon v-if="manualAdding" name="mdi:loading" class="animate-spin inline" />
+            {{ manualAdding ? 'Đang thêm...' : 'Thêm thành viên' }}
           </button>
         </div>
       </div>
@@ -189,14 +258,6 @@
 </template>
 
 <script setup lang="ts">
-/**
- * Updated players-list.vue:
- * - POST to /tournaments/{tournamentId}/teams/{teamId}/members no longer sends id field.
- * - Manual '+' modal to add a free member (no id) with fields name, cccd, phoneNumber, shirt_number.
- * - Removed "Nguồn" line from card footer.
- * - Deduplicate members when merging: if duplicate by id or cccd or (name+shirt_number) then show only one.
- */
-
 import { ref, onMounted, watch, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useNuxtApp } from '#app';
@@ -205,7 +266,6 @@ const route = useRoute();
 const router = useRouter();
 const { $api } = useNuxtApp();
 
-// Optional toast helper
 let toast: any = null;
 try { toast = useToast(); } catch { /* ignore */ }
 
@@ -239,7 +299,6 @@ const manualForm = ref({
 
 const idKey = (p: any) => p?.id ?? p?.playerId ?? p?.cccd ?? `${(p?.name||'')}-${(p?.shirt_number ?? p?.shirtNumber ?? '')}`;
 
-/* normalize response to array */
 function extractArray(payload: any): any[] {
   if (!payload) return [];
   if (Array.isArray(payload)) return payload;
@@ -255,7 +314,7 @@ function extractArray(payload: any): any[] {
 
 async function fetchTeamPlayers(tid: number | string) {
   try {
-    const res = await $api.get(`/players/by-team/${tid}`);
+    const res = await $api.get(`/api/players/by-team/${tid}`);
     responseRaw.value = responseRaw.value ?? {};
     responseRaw.value.teamPlayers = res;
     teamPlayers.value = extractArray(res);
@@ -266,7 +325,7 @@ async function fetchTeamPlayers(tid: number | string) {
 
 async function fetchTournamentMembers(tourId: number | string, tid: number | string) {
   try {
-    const res = await $api.get(`/tournaments/${tourId}/teams/${tid}/members`);
+    const res = await $api.get(`/api/tournaments/${tourId}/teams/${tid}/members`);
     responseRaw.value = responseRaw.value ?? {};
     responseRaw.value.tournamentMembers = res;
     tournamentMembers.value = extractArray(res);
@@ -287,23 +346,19 @@ async function fetchTournamentMembers(tourId: number | string, tid: number | str
   }
 }
 
-/* Merge and deduplicate: prefer id > cccd > name+shirt */
 function buildCombined() {
   const map = new Map<string, any>();
 
-  // helper to compute keys
   const keyFor = (p: any) => {
     if (p == null) return null;
     if (p.id != null) return `id:${p.id}`;
     if (p.playerId != null) return `id:${p.playerId}`;
     if (p.cccd) return `cccd:${p.cccd}`;
-    // fallback to name+shirt (normalize)
     const name = (p.name || '').toString().trim().toLowerCase();
     const shirt = String(p.shirt_number ?? p.shirtNumber ?? '');
     return `ns:${name}|${shirt}`;
   };
 
-  // first add tournamentMembers (they should be considered primary for status)
   (tournamentMembers.value || []).forEach((m: any) => {
     const k = keyFor(m) || `tmp:${Math.random().toString(36).slice(2,9)}`;
     const entry = {
@@ -313,18 +368,16 @@ function buildCombined() {
       cccd: m.cccd,
       phoneNumber: m.phoneNumber,
       shirt_number: m.shirt_number ?? m.shirtNumber,
-      status: 'tuDo', // will adjust if roster matches
+      status: 'tuDo',
       source: 'Tournament only',
     };
     map.set(k, entry);
   });
 
-  // then incorporate roster players: if exist in map, mark as raSan; otherwise add as khongDK
   (teamPlayers.value || []).forEach((p: any) => {
     const k = keyFor(p) || `tmp:${Math.random().toString(36).slice(2,9)}`;
     const existing = map.get(k);
     if (existing) {
-      // merge roster fields and mark as raSan
       map.set(k, {
         ...existing,
         ...p,
@@ -337,8 +390,6 @@ function buildCombined() {
         source: 'Team & Tournament',
       });
     } else {
-      // maybe map contains same person by other key (e.g., tournament had id but roster uses cccd)
-      // attempt to find by id or cccd
       let foundKey: string | undefined;
       for (const [mk, mv] of map.entries()) {
         if (mv && ( (mv.id && (p.id && String(mv.id)===String(p.id))) || (mv.cccd && p.cccd && String(mv.cccd)===String(p.cccd)) )) {
@@ -374,7 +425,6 @@ function buildCombined() {
     }
   });
 
-  // Convert map to array and sort by shirt_number
   const arr = Array.from(map.values());
   arr.sort((a: any, b: any) => {
     const na = Number(a.shirt_number ?? a.shirtNumber ?? 999);
@@ -397,7 +447,6 @@ async function fetchAll() {
     if (!noMembersInTournament.value) {
       error.value = e?.message || String(e);
     }
-    // still try to show roster if present
     buildCombined();
   } finally {
     loading.value = false;
@@ -425,25 +474,10 @@ const membersFiltered = computed(() => {
   });
 });
 
-const debugSnippet = computed(() => {
-  try {
-    const s = typeof responseRaw.value === 'string' ? responseRaw.value : JSON.stringify(responseRaw.value);
-    return s.slice(0, 1000);
-  } catch {
-    return String(responseRaw.value).slice(0, 1000);
-  }
-});
-
 const hasAvatar = (p: any) => !!(p?.avatar && typeof p.avatar === 'string' && p.avatar.startsWith('http'));
 const openPlayer = (p: any) => console.log('Open player', p);
 const goBack = () => router.back();
 const refresh = () => fetchAll();
-
-/**
- * NOTE: API change:
- * - POST /tournaments/{tournamentId}/teams/{teamId}/members no longer expects an "id" field.
- * - We'll send only: { name, cccd, phoneNumber, shirt_number } for both manual adds and roster adds.
- */
 
 async function addMember(player: any) {
   const key = idKey(player);
@@ -451,7 +485,6 @@ async function addMember(player: any) {
   if (addingIds.value.has(key)) return;
   addingIds.value.add(key);
 
-  // Build payload WITHOUT id
   const payload: any = {
     name: player.name,
     cccd: player.cccd,
@@ -460,7 +493,7 @@ async function addMember(player: any) {
   };
 
   try {
-    await $api.post(`/tournaments/${tournamentId}/teams/${teamId}/members`, payload);
+    await $api.post(`/api/tournaments/${tournamentId}/teams/${teamId}/members`, payload);
     await fetchAll();
     toast?.success?.({ message: 'Thêm thành viên vào đội trong giải đấu thành công', position: 'topRight' });
   } catch (e: any) {
@@ -479,7 +512,7 @@ async function removeMember(player: any) {
   if (removingIds.value.has(key)) return;
   removingIds.value.add(key);
   try {
-    await $api.delete(`/tournaments/${tournamentId}/teams/${teamId}/members/${playerId}`);
+    await $api.delete(`/api/tournaments/${tournamentId}/teams/${teamId}/members/${playerId}`);
     await fetchAll();
     toast?.success?.({ message: 'Xóa thành viên khỏi đội trong giải đấu thành công', position: 'topRight' });
   } catch (e: any) {
@@ -503,14 +536,14 @@ async function addAllTeamMembers() {
     const key = p.id ?? p.playerId ?? p.cccd ?? `${(p.name||'')}-${(p.shirt_number ?? p.shirtNumber ?? '')}`;
     if (!key) continue;
     addingIds.value.add(key);
-    const payload = { // no id field
+    const payload = {
       name: p.name,
       cccd: p.cccd,
       phoneNumber: p.phoneNumber,
       shirt_number: p.shirt_number ?? p.shirtNumber,
     };
     try {
-      await $api.post(`/tournaments/${tournamentId}/teams/${teamId}/members`, payload);
+      await $api.post(`/api/tournaments/${tournamentId}/teams/${teamId}/members`, payload);
       added.push(String(key));
     } catch (e) {
       failed.push(String(key));
@@ -526,7 +559,6 @@ async function addAllTeamMembers() {
 }
 function onAddAllConfirm() { addAllTeamMembers(); }
 
-/* Manual add modal handlers */
 function openManualModal() {
   manualForm.value = { name: '', cccd: '', phoneNumber: '', shirt_number: null };
   manualModalOpen.value = true;
@@ -547,7 +579,7 @@ async function addManualMember() {
     shirt_number: manualForm.value.shirt_number ?? undefined,
   };
   try {
-    await $api.post(`/tournaments/${tournamentId}/teams/${teamId}/members`, payload);
+    await $api.post(`/api/tournaments/${tournamentId}/teams/${teamId}/members`, payload);
     toast?.success?.({ message: 'Thêm thành viên vào đội trong giải đấu thành công', position: 'topRight' });
     manualModalOpen.value = false;
     await fetchAll();
@@ -561,50 +593,50 @@ async function addManualMember() {
 </script>
 
 <style scoped>
-/* HERO background: full area gradient (no blank spaces) */
-.page-hero{
-  width:100%;
-  min-height:160px; /* reduced height to remove large top gap */
-  background: linear-gradient(135deg,#08103a 0%, #0f2a67 45%, #3b1e6f 100%);
-  background-size:cover;
-  background-position:center;
-  position:relative;
-  z-index:10;
-  /* subtle overlay to increase contrast */
-  box-shadow: inset 0 40px 80px rgba(3,7,18,0.25);
+.page-hero {
+  background: linear-gradient(135deg, #e2705a 0%, #b953b0 50%, #6366f1 100%);
+  padding: 4rem 0 6rem;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
 }
 
-/* Content panel overlaps hero and gives a readable white canvas for controls and cards */
-.page-content{
-  max-width:1200px;
-  margin: -80px auto 60px; /* smaller negative margin to pull panel up but reduce top gap */
-  background: rgba(255,255,255,0.98);
-  border-radius:12px;
-  padding:24px;
-  box-shadow: 0 18px 40px rgba(7,8,26,0.18);
-  border: 1px solid rgba(15,23,42,0.06);
-  position:relative;
-  z-index:40;
+.page-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
-/* Cards */
-.card{
-  transition: box-shadow .18s ease, transform .18s ease;
-}
-.card:hover{
-  transform: translateY(-6px);
-  box-shadow: 0 18px 40px rgba(7,8,26,0.12);
+.hero-content {
+  position: relative;
+  z-index: 10;
 }
 
-/* Avatar round */
-.avatar img{ border-radius:9999px; }
+.page-content {
+  margin-top: -3rem;
+  position: relative;
+  z-index: 20;
+  padding-bottom: 4rem;
+}
 
-/* Banner align */
-.banner{ align-items:center; }
+.member-card {
+  position: relative;
+  overflow: hidden;
+}
 
-/* page sizing */
-.players-page{ width:100vw; overflow-x:hidden; }
+.member-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #f97316 0%, #ec4899 100%);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
 
-/* helper clamp (if needed elsewhere) */
-.line-clamp-3{ display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; word-break:break-word; }
+.member-card:hover::before {
+  transform: scaleX(1);
+}
 </style>
